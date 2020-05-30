@@ -2,8 +2,15 @@
 	"name": "three-js",
 	"version": "0.0.0",
 	"private": true,
-	"author": "PatrickNausha <patrick.nausha@gmail.com>",
-	"devDependencies": {},
+	"author": "PatrickNausha",
+	"scripts": {
+		"build": "NODE_ENV=production parcel build index.html --public-url ./",
+		"deploy": "gh-pages -d dist"
+	},
+	"devDependencies": {
+		"cssnano": "^4.1.10",
+		"gh-pages": "^3.0.0"
+	},
 	"dependencies": {
 		"three": "^0.117.1"
 	}
