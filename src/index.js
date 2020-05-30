@@ -11,13 +11,15 @@ import {
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
-const renderer = new WebGLRenderer();
+const renderer = new WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 const scene = new Scene();
 const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 15;
+camera.position.x = 10;
+camera.position.y = 7;
+camera.position.z = 7;
 new OrbitControls(camera, renderer.domElement);
 
 const material = new MeshStandardMaterial();
