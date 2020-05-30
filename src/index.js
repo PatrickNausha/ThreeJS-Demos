@@ -22,13 +22,13 @@ camera.position.y = 7;
 camera.position.z = 7;
 new OrbitControls(camera, renderer.domElement);
 
-const material = new MeshStandardMaterial();
-const bottom = new Mesh(new BoxGeometry(8, 2, 5), material);
+const buildingMaterial = new MeshStandardMaterial();
+const bottom = new Mesh(new BoxGeometry(8, 2, 5), buildingMaterial);
 scene.add(bottom);
-const middle = new Mesh(new BoxGeometry(7, 1, 3), material);
+const middle = new Mesh(new BoxGeometry(7, 1, 3), buildingMaterial);
 middle.position.set(0.5, 1.5, 0);
 scene.add(middle);
-const front = new Mesh(new BoxGeometry(1, 4, 3), material);
+const front = new Mesh(new BoxGeometry(1, 4, 3), buildingMaterial);
 front.position.set(4.5, 1, 0);
 scene.add(front);
 
@@ -46,11 +46,11 @@ const pillar2 = new Mesh(new CylinderGeometry(0.2, 0.2, 3), brown);
 pillar2.position.set(5.25, 0.5, -1.125);
 scene.add(pillar2);
 
-const lights = [new PointLight(0xffffff, 1, 0), new PointLight(0xffffff, 1, 0), new PointLight(0xffffff, 0.5, 0)];
+const lights = [new PointLight(0xffffff, 1, 0), new PointLight(0xffffff, 1, 0), new PointLight(0xffffff, 1, 0)];
 
-lights[0].position.set(0, 200, 0);
-lights[1].position.set(100, 200, 100);
-lights[2].position.set(-100, -200, -100);
+lights[0].position.set(0, 10, 0);
+lights[1].position.set(10, 10, 10);
+lights[2].position.set(-10, -10, -10);
 
 scene.add(lights[0]);
 scene.add(lights[1]);
