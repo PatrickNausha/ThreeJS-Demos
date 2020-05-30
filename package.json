@@ -1,0 +1,10 @@
+{
+	"name": "three-js",
+	"version": "0.0.0",
+	"private": true,
+	"author": "PatrickNausha <patrick.nausha@gmail.com>",
+	"devDependencies": {},
+	"dependencies": {
+		"three": "^0.117.1"
+	}
+}
