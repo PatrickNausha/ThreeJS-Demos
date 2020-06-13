@@ -1,9 +1,10 @@
 import { BoxGeometry, MeshBasicMaterial, Mesh, Group } from "three";
 
 const lights = [];
-const debugLightMaterial = new MeshBasicMaterial();
 export function addLight(scene, light) {
 	const group = new Group();
+	const debugLightMaterial = new MeshBasicMaterial();
+	debugLightMaterial.color = light.color;
 	const debugLight = new Mesh(new BoxGeometry(0.4, 0.4, 0.4), debugLightMaterial);
 	debugLight.visible = false;
 
