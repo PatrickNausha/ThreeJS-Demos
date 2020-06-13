@@ -30,20 +30,19 @@ const plainMaterial = new MeshStandardMaterial();
 const spheres = [
 	new Mesh(new SphereGeometry(1, 20, 20), plainMaterial),
 	new Mesh(new SphereGeometry(2, 20, 20), plainMaterial),
-	new Mesh(new SphereGeometry(1, 20, 20), plainMaterial),
 ];
 scene.add(spheres[0]);
 spheres[1].position.set(-4, 0, -3);
 scene.add(spheres[1]);
-scene.add(spheres[2]);
 
 const box = new Mesh(new BoxGeometry(1, 1, 1), plainMaterial);
 box.position.set(4, 0, 4);
 box.rotateY(45);
 scene.add(box);
 
-const sceneLights = [addLight(scene, new PointLight(0xffffff, 1, 0))];
+const sceneLights = [addLight(scene, new PointLight(0xffffff, 1, 0)), addLight(scene, new PointLight(0xff0000, 1, 0))];
 sceneLights[0].group.position.set(3, 4, 3);
+console.log(sceneLights[0].light.color);
 
 var light = new AmbientLight(0x111111); // soft white light
 scene.add(light);
@@ -61,6 +60,7 @@ function step() {
 		3,
 		2 * Math.cos(new Date().getTime() / 1000)
 	);
+	sceneLights[1].group.position.set(1, 4 + 5 * Math.sin(new Date().getTime() / 1000), 3);
 }
 
 window.document.addEventListener("keydown", (event) => {
