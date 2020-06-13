@@ -10,6 +10,7 @@ import {
 	CylinderGeometry,
 	Group,
 	SphereGeometry,
+	AmbientLight,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { toggleDebug, addLight } from "./lights";
@@ -26,17 +27,41 @@ camera.position.z = 5;
 new OrbitControls(camera, renderer.domElement);
 
 const plainMaterial = new MeshStandardMaterial();
-const sphere = new Mesh(new SphereGeometry(1, 20, 20), plainMaterial);
-scene.add(sphere);
+const spheres = [
+	new Mesh(new SphereGeometry(1, 20, 20), plainMaterial),
+	new Mesh(new SphereGeometry(2, 20, 20), plainMaterial),
+	new Mesh(new SphereGeometry(1, 20, 20), plainMaterial),
+];
+scene.add(spheres[0]);
+spheres[1].position.set(-4, 0, -3);
+scene.add(spheres[1]);
+scene.add(spheres[2]);
+
+const box = new Mesh(new BoxGeometry(1, 1, 1), plainMaterial);
+box.position.set(4, 0, 4);
+box.rotateY(45);
+scene.add(box);
 
 const sceneLights = [addLight(scene, new PointLight(0xffffff, 1, 0))];
-sceneLights[0].group.position.set(4, 4, 4);
+sceneLights[0].group.position.set(3, 4, 3);
+
+var light = new AmbientLight(0x111111); // soft white light
+scene.add(light);
 
 function animate() {
+	step();
 	requestAnimationFrame(animate);
 	renderer.render(scene, camera);
 }
 animate();
+
+function step() {
+	sceneLights[0].group.position.set(
+		2 * Math.sin(new Date().getTime() / 1000),
+		3,
+		2 * Math.cos(new Date().getTime() / 1000)
+	);
+}
 
 window.document.addEventListener("keydown", (event) => {
 	if (event.isComposing || event.keyCode === "1".charCodeAt(0)) {
