@@ -16,6 +16,7 @@ import { toggleDebugLights, addLight } from "./lights";
 import { slamItOnTheGround } from "./positioning";
 
 const renderer = new WebGLRenderer({ antialias: true });
+renderer.shadowMap.enabled = true;
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
@@ -42,9 +43,11 @@ scene.add(groundMesh);
 for (let x = -10; x <= 10; x += 5) {
 	for (let z = -10; z <= 10; z += 5) {
 		const sphere = new Mesh(new SphereGeometry(1, 20, 20), plainMaterial);
-		scene.add(sphere);
 		sphere.position.set(x, 0, z);
+		sphere.castShadow = true;
+		sphere.receiveShadow = true;
 		slamItOnTheGround(sphere, x, z, 0);
+		scene.add(sphere);
 	}
 }
 
@@ -55,10 +58,12 @@ box.rotateY(45);
 scene.add(box);
 
 // Lights
-const sceneLights = [
-	addLight(scene, new PointLight(0xffffff, 1, 10, 2)),
-	addLight(scene, new PointLight(0xff0000, 1, 10, 2)),
-];
+const whiteLight = new PointLight(0xffffff, 1, 10, 2);
+whiteLight.castShadow = true;
+const redLight = new PointLight(0xff0000, 1, 10, 2);
+redLight.castShadow = true;
+
+const sceneLights = [addLight(scene, whiteLight), addLight(scene, redLight)];
 sceneLights[0].group.position.set(3, 4, 3);
 
 var light = new AmbientLight(0x111111); // soft white light
