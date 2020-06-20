@@ -13,6 +13,7 @@ import {
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { updateStats, toggleStats } from "./debug-stats";
 import { toggleDebugLights, addLight } from "./lights";
+import { slamItOnTheGround } from "./positioning";
 
 const renderer = new WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -43,6 +44,7 @@ for (let x = -10; x <= 10; x += 5) {
 		const sphere = new Mesh(new SphereGeometry(1, 20, 20), plainMaterial);
 		scene.add(sphere);
 		sphere.position.set(x, 0, z);
+		slamItOnTheGround(sphere, x, z, 0);
 	}
 }
 
