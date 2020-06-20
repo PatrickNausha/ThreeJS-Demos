@@ -26,7 +26,8 @@ const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight,
 camera.position.x = 5;
 camera.position.y = 5;
 camera.position.z = 5;
-new OrbitControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.maxPolarAngle = Math.PI * 0.45;
 
 const plainMaterial = new MeshStandardMaterial();
 
@@ -37,8 +38,8 @@ groundMesh.rotation.x = -Math.PI / 2;
 scene.add(groundMesh);
 
 // Tons of spheres for fun
-for (let x = -50; x <= 50; x += 5) {
-	for (let z = -50; z <= 50; z += 5) {
+for (let x = -10; x <= 10; x += 5) {
+	for (let z = -10; z <= 10; z += 5) {
 		const sphere = new Mesh(new SphereGeometry(1, 20, 20), plainMaterial);
 		scene.add(sphere);
 		sphere.position.set(x, 0, z);
