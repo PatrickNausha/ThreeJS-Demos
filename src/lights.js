@@ -24,7 +24,7 @@ export function addLight(scene, light) {
 	return debugableLight;
 }
 
-export function toggleDebug() {
+export function toggleDebugLights() {
 	for (const light of lights) {
 		light.toggleDebug();
 	}

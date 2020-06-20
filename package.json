@@ -9,7 +9,8 @@
 	},
 	"devDependencies": {
 		"cssnano": "^4.1.10",
-		"gh-pages": "^3.0.0"
+		"gh-pages": "^3.0.0",
+		"stats-js": "^1.0.1"
 	},
 	"dependencies": {
 		"three": "^0.117.1"

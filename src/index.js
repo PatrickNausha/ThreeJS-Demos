@@ -4,22 +4,24 @@ import {
 	WebGLRenderer,
 	BoxGeometry,
 	MeshStandardMaterial,
-	MeshBasicMaterial,
 	Mesh,
 	PointLight,
-	CylinderGeometry,
-	Group,
 	SphereGeometry,
 	AmbientLight,
+	PlaneBufferGeometry,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { toggleDebug, addLight } from "./lights";
+import { updateStats, toggleStats } from "./debug-stats";
+import { toggleDebugLights, addLight } from "./lights";
 
 const renderer = new WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+// In the beginning ...
 const scene = new Scene();
+
+// Camera
 const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.x = 5;
 camera.position.y = 5;
@@ -27,30 +29,44 @@ camera.position.z = 5;
 new OrbitControls(camera, renderer.domElement);
 
 const plainMaterial = new MeshStandardMaterial();
-const spheres = [
-	new Mesh(new SphereGeometry(1, 20, 20), plainMaterial),
-	new Mesh(new SphereGeometry(2, 20, 20), plainMaterial),
-];
-scene.add(spheres[0]);
-spheres[1].position.set(-4, 0, -3);
-scene.add(spheres[1]);
 
+// Add the ground
+const groundMesh = new Mesh(new PlaneBufferGeometry(1000, 1000), plainMaterial);
+groundMesh.receiveShadow = true;
+groundMesh.rotation.x = -Math.PI / 2;
+scene.add(groundMesh);
+
+// Tons of spheres for fun
+for (let x = -50; x <= 50; x += 5) {
+	for (let z = -50; z <= 50; z += 5) {
+		const sphere = new Mesh(new SphereGeometry(1, 20, 20), plainMaterial);
+		scene.add(sphere);
+		sphere.position.set(x, 0, z);
+	}
+}
+
+// Box for fun
 const box = new Mesh(new BoxGeometry(1, 1, 1), plainMaterial);
 box.position.set(4, 0, 4);
 box.rotateY(45);
 scene.add(box);
 
-const sceneLights = [addLight(scene, new PointLight(0xffffff, 1, 0)), addLight(scene, new PointLight(0xff0000, 1, 0))];
+// Lights
+const sceneLights = [
+	addLight(scene, new PointLight(0xffffff, 1, 10, 2)),
+	addLight(scene, new PointLight(0xff0000, 1, 10, 2)),
+];
 sceneLights[0].group.position.set(3, 4, 3);
-console.log(sceneLights[0].light.color);
 
 var light = new AmbientLight(0x111111); // soft white light
 scene.add(light);
 
+// Main loop
 function animate() {
-	step();
 	requestAnimationFrame(animate);
+	step();
 	renderer.render(scene, camera);
+	updateStats();
 }
 animate();
 
@@ -65,6 +81,7 @@ function step() {
 
 window.document.addEventListener("keydown", (event) => {
 	if (event.isComposing || event.keyCode === "1".charCodeAt(0)) {
-		toggleDebug();
+		toggleDebugLights();
+		toggleStats();
 	}
 });
