@@ -1,31 +1,26 @@
-import { BoxGeometry, MeshBasicMaterial, Mesh, Group } from "three";
+import { BoxGeometry, MeshBasicMaterial, Mesh, Group, PointLightHelper } from "three";
 
 const lights = [];
+const lightHelperSize = 0.1;
 export function addLight(scene, light) {
-	const group = new Group();
-	const debugLightMaterial = new MeshBasicMaterial();
-	debugLightMaterial.color = light.color;
-	const debugLight = new Mesh(new BoxGeometry(0.4, 0.4, 0.4), debugLightMaterial);
-	debugLight.visible = false;
+	const pointLightHelper = new PointLightHelper(light, lightHelperSize);
+	pointLightHelper.visible = false;
 
-	group.add(light);
-	group.add(debugLight);
-
-	scene.add(group);
+	scene.add(light);
+	scene.add(pointLightHelper);
 
 	const debugableLight = {
-		group,
 		light,
-		toggleDebug: () => {
-			debugLight.visible = !debugLight.visible;
+		setDebugLightOn: (value) => {
+			pointLightHelper.visible = value;
 		},
 	};
 	lights.push(debugableLight);
 	return debugableLight;
 }
 
-export function toggleDebugLights() {
+export function setDebugLightsOn(value) {
 	for (const light of lights) {
-		light.toggleDebug();
+		light.setDebugLightOn(value);
 	}
 }

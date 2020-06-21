@@ -9,6 +9,7 @@
 	},
 	"devDependencies": {
 		"cssnano": "^4.1.10",
+		"dat.gui": "^0.7.7",
 		"gh-pages": "^3.0.0",
 		"stats-js": "^1.0.1"
 	},

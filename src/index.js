@@ -2,7 +2,6 @@ import {
 	Scene,
 	PerspectiveCamera,
 	WebGLRenderer,
-	BoxGeometry,
 	MeshStandardMaterial,
 	Mesh,
 	PointLight,
@@ -15,8 +14,9 @@ import {
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { updateStats, toggleStats } from "./debug-stats";
-import { toggleDebugLights, addLight } from "./lights";
+import { addLight, setDebugLightsOn } from "./lights";
 import { slamItOnTheGround } from "./positioning";
+import { GUI } from "dat.gui";
 
 const shadowMaps = [PCFSoftShadowMap, VSMShadowMap, PCFShadowMap];
 
@@ -77,11 +77,31 @@ redLight.shadow.mapSize.height = 512;
 redLight.shadow.radius = 4;
 redLight.castShadow = true;
 
-const sceneLights = [addLight(scene, whiteLight), addLight(scene, redLight)];
-sceneLights[0].group.position.set(3, 4, 3);
+addLight(scene, whiteLight);
+addLight(scene, redLight);
 
-var light = new AmbientLight(ambientLightColor);
-scene.add(light);
+const ambientLight = new AmbientLight(ambientLightColor);
+scene.add(ambientLight);
+
+const guiParams = {
+	debugLights: true,
+	showLight0: true,
+	showLight1: true,
+};
+const gui = new GUI();
+gui.add(guiParams, "debugLights").onChange((value) => {
+	setDebugLightsOn(value);
+});
+gui.add(guiParams, "showLight0").onChange((value) => {
+	whiteLight.visible = value;
+});
+gui.add(guiParams, "showLight1").onChange((value) => {
+	redLight.visible = value;
+});
+setDebugLightsOn(guiParams.debugLights);
+
+// Show stats
+toggleStats();
 
 // Main loop
 function animate() {
@@ -93,21 +113,6 @@ function animate() {
 animate();
 
 function step() {
-	sceneLights[0].group.position.set(
-		2 * Math.sin(new Date().getTime() / 1000),
-		3,
-		2 * Math.cos(new Date().getTime() / 1000)
-	);
-	sceneLights[1].group.position.set(1, 3 + 2 * Math.sin(new Date().getTime() / 1000), 3);
+	whiteLight.position.set(2 * Math.sin(new Date().getTime() / 1000), 3, 2 * Math.cos(new Date().getTime() / 1000));
+	redLight.position.set(1, 3 + 2 * Math.sin(new Date().getTime() / 1000), 3);
 }
-
-let shadowMapIndex = 0;
-window.document.addEventListener("keydown", (event) => {
-	if (event.isComposing || event.keyCode === "1".charCodeAt(0)) {
-		toggleDebugLights();
-		toggleStats();
-	} else if (event.isComposing || event.keyCode === "2".charCodeAt(0)) {
-		shadowMapIndex++;
-		renderer.shadowMap.type = shadowMaps[shadowMapIndex % shadowMaps.length];
-	}
-});
