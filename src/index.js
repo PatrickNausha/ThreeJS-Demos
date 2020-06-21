@@ -87,6 +87,7 @@ const guiParams = {
 	debugLights: true,
 	showLight0: true,
 	showLight1: true,
+	animateLights: true,
 };
 const gui = new GUI();
 gui.add(guiParams, "debugLights").onChange((value) => {
@@ -98,6 +99,7 @@ gui.add(guiParams, "showLight0").onChange((value) => {
 gui.add(guiParams, "showLight1").onChange((value) => {
 	redLight.visible = value;
 });
+gui.add(guiParams, "animateLights");
 setDebugLightsOn(guiParams.debugLights);
 
 // Show stats
@@ -112,7 +114,10 @@ function animate() {
 }
 animate();
 
+var lastTime = new Date().getTime();
 function step() {
-	whiteLight.position.set(2 * Math.sin(new Date().getTime() / 1000), 3, 2 * Math.cos(new Date().getTime() / 1000));
-	redLight.position.set(1, 3 + 2 * Math.sin(new Date().getTime() / 1000), 3);
+	const time = guiParams.animateLights ? new Date().getTime() : lastTime;
+	whiteLight.position.set(2 * Math.sin(time / 1000), 3, 2 * Math.cos(time / 1000));
+	redLight.position.set(1, 3 + 2 * Math.sin(time / 1000), 3);
+	lastTime = time;
 }
