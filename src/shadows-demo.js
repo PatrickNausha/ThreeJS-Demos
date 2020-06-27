@@ -62,7 +62,7 @@ for (let x = -10; x <= 10; x += 5) {
 		spheres.push(sphere);
 		scene.add(sphere);
 
-		const box = new Mesh(new BoxGeometry(1, 1, 1), plainMaterial);
+		const box = new Mesh(new BoxGeometry(2, 2, 2), plainMaterial);
 		box.position.set(x, 0, z);
 		box.castShadow = true;
 		box.receiveShadow = true;
@@ -98,22 +98,27 @@ scene.add(ambientLight);
 
 const guiParams = {
 	debugLights: true,
-	showLight0: true,
-	showLight1: true,
+	light0: true,
+	light1: true,
 	animateLights: true,
 	model: "sphere",
 };
+
 const gui = new GUI();
 gui.add(guiParams, "debugLights").onChange((value) => {
 	setDebugLightsOn(value);
 });
-gui.add(guiParams, "showLight0").onChange((value) => {
+setDebugLightsOn(guiParams.debugLights);
+
+gui.add(guiParams, "light0").onChange((value) => {
 	whiteLight.visible = value;
 });
-gui.add(guiParams, "showLight1").onChange((value) => {
+gui.add(guiParams, "light1").onChange((value) => {
 	redLight.visible = value;
 });
-gui.add(guiParams, "model", ["sphere", "cube"]).onChange((value) => {
+
+gui.add(guiParams, "model", ["sphere", "cube"]).onChange(showModels);
+function showModels(value) {
 	for (const model of models) {
 		model.visible = false;
 	}
@@ -129,9 +134,10 @@ gui.add(guiParams, "model", ["sphere", "cube"]).onChange((value) => {
 	for (const model of thingsToShow) {
 		model.visible = true;
 	}
-});
+}
+showModels(guiParams.model);
+
 gui.add(guiParams, "animateLights");
-setDebugLightsOn(guiParams.debugLights);
 
 // Show stats
 toggleStats();
