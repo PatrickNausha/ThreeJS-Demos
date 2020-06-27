@@ -4,6 +4,7 @@
 	"private": true,
 	"author": "PatrickNausha",
 	"scripts": {
+		"dev": "parcel index.html assets/**/*",
 		"build": "rm -rf ./dist && NODE_ENV=production parcel build index.html --public-url ./",
 		"deploy": "gh-pages -d dist"
 	},
