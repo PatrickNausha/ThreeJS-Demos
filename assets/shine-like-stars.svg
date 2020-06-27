@@ -70,7 +70,6 @@
             <circle cx="273.72" cy="279.4" r="1.42" stroke-miterlimit="10" stroke="#fff" fill="#fff"/>
             <circle cx="339.4" cy="264.25" r="1.26" stroke-miterlimit="10" stroke="#fff" fill="#fff"/>
             <path d="M271.19 202.35c-12.63 3-21.31 22.26-18.15 35.21 3.11 12.76 16.89 23.21 33.94 20.69 0 0-23.6-6.57-25.73-24.48-2.06-17.21 12.1-31.93 9.94-31.42z" stroke-linecap="round" stroke-width="2" fill="none" stroke-linejoin="round" stroke="#fff"/>
-            <path d="M447.4 184a58.39 58.39 0 015.85-.32l3.94-6 1.27 5.05 3.47.32-3.32 4.58 1.27 8.21-6.16-4.27-4.72 3.83 2.37-7.42z" fill="none" stroke-linejoin="round" stroke="#fff"/>
             <path fill="none" stroke-linejoin="round" stroke="#fff" d="M261.99 129.82l-1.38 3.62-4.14 1.27 2.65 1.49-.53 4.89 3.29-3.08 3.3 2.02-.96-4.57 2.55-2.87-3.29.1-1.49-2.87z"/>
             <path fill="none" stroke-linejoin="round" stroke="#fff" d="M410.81 162.06l-1.56 1.8-2.36-.47.55 2.12-1.72 2.74 3.06-1.02 1.72 1.81.47-3.06 1.8-1.02-1.72-.7-.24-2.2z"/>
             <path fill="none" stroke-linejoin="round" stroke="#fff" d="M211.7 225.13l-1.88 2.15-2.8-.56.65 2.53-2.05 3.27 3.64-1.21 2.06 2.15.56-3.65 2.16-1.22-2.06-.84-.28-2.62z"/>
