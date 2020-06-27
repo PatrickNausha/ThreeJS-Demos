@@ -11,6 +11,7 @@ import {
 	VSMShadowMap,
 	PCFShadowMap,
 	PCFSoftShadowMap,
+	BoxGeometry,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { updateStats, toggleStats } from "./debug-stats";
@@ -48,7 +49,9 @@ groundMesh.receiveShadow = true;
 groundMesh.rotation.x = -Math.PI / 2;
 scene.add(groundMesh);
 
-// Tons of spheres for fun
+// Add models
+const spheres = [];
+const boxes = [];
 for (let x = -10; x <= 10; x += 5) {
 	for (let z = -10; z <= 10; z += 5) {
 		const sphere = new Mesh(new SphereGeometry(1, 20, 20), plainMaterial);
@@ -56,9 +59,19 @@ for (let x = -10; x <= 10; x += 5) {
 		sphere.castShadow = true;
 		sphere.receiveShadow = true;
 		slamItOnTheGround(sphere, x, z, 0);
+		spheres.push(sphere);
 		scene.add(sphere);
+
+		const box = new Mesh(new BoxGeometry(1, 1, 1), plainMaterial);
+		box.position.set(x, 0, z);
+		box.castShadow = true;
+		box.receiveShadow = true;
+		slamItOnTheGround(box, x, z, 0);
+		boxes.push(box);
+		scene.add(box);
 	}
 }
+const models = [...spheres, ...boxes];
 
 // Lights
 const whiteLight = new PointLight(0xffffff, 1, 10, 2);
@@ -88,6 +101,7 @@ const guiParams = {
 	showLight0: true,
 	showLight1: true,
 	animateLights: true,
+	model: "sphere",
 };
 const gui = new GUI();
 gui.add(guiParams, "debugLights").onChange((value) => {
@@ -98,6 +112,23 @@ gui.add(guiParams, "showLight0").onChange((value) => {
 });
 gui.add(guiParams, "showLight1").onChange((value) => {
 	redLight.visible = value;
+});
+gui.add(guiParams, "model", ["sphere", "cube"]).onChange((value) => {
+	for (const model of models) {
+		model.visible = false;
+	}
+	let thingsToShow;
+	switch (value) {
+		case "sphere":
+			thingsToShow = spheres;
+			break;
+		case "cube":
+			thingsToShow = boxes;
+			break;
+	}
+	for (const model of thingsToShow) {
+		model.visible = true;
+	}
 });
 gui.add(guiParams, "animateLights");
 setDebugLightsOn(guiParams.debugLights);
