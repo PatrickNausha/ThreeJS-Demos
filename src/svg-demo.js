@@ -58,7 +58,7 @@ loader.load(
 			const shapes = path.toShapes(true);
 
 			const { fill, stroke } = path.userData.style;
-			if (fill !== undefined && fill !== "none") {
+			if (fill && fill !== "none") {
 				for (const shape of shapes) {
 					const geometry = new ShapeBufferGeometry(shape);
 					const mesh = new Mesh(geometry, material);
@@ -66,7 +66,7 @@ loader.load(
 				}
 			}
 
-			if (stroke !== undefined && stroke !== "none") {
+			if (stroke && stroke !== "none") {
 				for (const shape of shapes) {
 					const geometry = SVGLoader.pointsToStroke(shape.getPoints(), path.userData.style);
 					const mesh = new Mesh(geometry, material);
