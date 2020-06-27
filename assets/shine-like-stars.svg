@@ -1,7 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 576">
     <g data-name="Layer 2">
         <g data-name="Layer 4">
-            <!-- <path fill="#f0d8d2" d="M0 0h576v576H0z"/> -->
             <ellipse cx="169.67" cy="224.46" rx="1.74" ry="1.82" stroke-miterlimit="10" stroke="#fff" fill="#fff"/>
             <ellipse cx="234.88" cy="199.04" rx="1.18" ry="1.11" stroke-miterlimit="10" stroke="#fff" fill="#fff"/>
             <circle cx="135.4" cy="217.43" r="1.5" stroke-miterlimit="10" stroke="#fff" fill="#fff"/>
