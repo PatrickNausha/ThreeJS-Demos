@@ -3,20 +3,18 @@ import {
 	PerspectiveCamera,
 	WebGLRenderer,
 	MeshStandardMaterial,
+	HemisphereLight,
 	Mesh,
-	MeshBasicMaterial,
 	Group,
 	DoubleSide,
-	ShapeBufferGeometry,
+	ExtrudeBufferGeometry,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader";
 import { updateStats, toggleStats } from "./debug-stats";
 
-const ambientLightColor = 0xf0d8d2;
-
-const renderer = new WebGLRenderer({ antialias: true });
-renderer.setClearColor(ambientLightColor);
+const renderer = new WebGLRenderer({ antialias: true, alpha: true });
+renderer.setClearColor(0x000000, 0);
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
@@ -24,7 +22,7 @@ document.body.appendChild(renderer.domElement);
 const scene = new Scene();
 
 // Camera
-const camera = new PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 1000);
+const camera = new PerspectiveCamera(28, window.innerWidth / window.innerHeight, 1, 1000);
 camera.position.z = -500;
 new OrbitControls(camera, renderer.domElement);
 
@@ -33,14 +31,12 @@ const plainMaterial = new MeshStandardMaterial();
 const loader = new SVGLoader();
 
 loader.load(
-	"./assets/shine-like-stars.svg",
+	"./assets/shine-like-stars-outlined-3.svg",
 	function ({ paths }) {
 		const group = new Group();
 		for (const path of paths) {
-			const material = new MeshBasicMaterial({
+			const material = new MeshStandardMaterial({
 				color: path.color,
-				side: DoubleSide,
-				depthWrite: false,
 			});
 
 			const shapes = path.toShapes(true);
@@ -48,15 +44,10 @@ loader.load(
 			const { fill, stroke } = path.userData.style;
 			if (fill && fill !== "none") {
 				for (const shape of shapes) {
-					const geometry = new ShapeBufferGeometry(shape);
-					const mesh = new Mesh(geometry, material);
-					group.add(mesh);
-				}
-			}
-
-			if (stroke && stroke !== "none") {
-				for (const shape of shapes) {
-					const geometry = SVGLoader.pointsToStroke(shape.getPoints(), path.userData.style);
+					const geometry = new ExtrudeBufferGeometry(shape, {
+						depth: 2,
+						bevelEnabled: false,
+					});
 					const mesh = new Mesh(geometry, material);
 					group.add(mesh);
 				}
@@ -64,8 +55,8 @@ loader.load(
 		}
 
 		group.rotateZ(Math.PI);
-		group.position.x = 288;
-		group.position.y = 256;
+		group.position.x = 200;
+		group.position.y = 150;
 		scene.add(group);
 	},
 	function (xhr) {
@@ -75,6 +66,9 @@ loader.load(
 		console.error(error);
 	}
 );
+
+const light = new HemisphereLight(0xaaaaff, 0xffaaaa, 1);
+scene.add(light);
 
 // Show stats
 toggleStats();
