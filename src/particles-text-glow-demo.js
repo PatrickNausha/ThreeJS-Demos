@@ -7,7 +7,7 @@ import {
 	MeshNormalMaterial,
 	FontLoader,
 	TextGeometry,
-	BoxGeometry,
+	PlaneGeometry,
 	Box3,
 	Vector3,
 } from "three";
@@ -26,13 +26,13 @@ const scene = new Scene();
 
 // Camera
 const camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
-camera.position.z = 160;
+camera.position.z = 200;
 new OrbitControls(camera, renderer.domElement);
 
 const font = new FontLoader().parse(helvetikerRegularJson);
 const fontGeometry = new TextGeometry("GLOW", {
 	font,
-	size: 80,
+	size: 40,
 	height: 5,
 	curveSegments: 12,
 	bevelEnabled: false,
@@ -45,25 +45,25 @@ const fontGroup = new Group();
 fontGroup.add(fontMesh);
 scene.add(fontGroup);
 
-const confettiBox = new Box3(new Vector3(-1000, -1000, -1000), new Vector3(1000, 1000, 100)); // Box within which to render confetti
+const confettiBox = new Box3(new Vector3(-1000, -1000, -1000), new Vector3(1000, 1000, -100)); // Box within which to render confetti
 const confetti = [];
 const confettiPieceCount = 100;
-const confettiPieceSize = 20;
+const confettiPieceSize = 50;
 for (let pieceCount = 0; pieceCount < confettiPieceCount; pieceCount++) {
-	const boxGroup = new Group();
+	const group = new Group();
 	const material = new MeshNormalMaterial({
 		transparent: true,
 	});
-	const box = new Mesh(new BoxGeometry(confettiPieceSize, confettiPieceSize, confettiPieceSize), material);
-	boxGroup.add(box);
+	const mesh = new Mesh(new PlaneGeometry(confettiPieceSize, confettiPieceSize), material);
+	group.add(mesh);
 
 	const orientation = getConfettiStartOrientation();
-	boxGroup.position.copy(orientation.position);
-	boxGroup.rotation.x += orientation.rotationX;
-	boxGroup.rotation.y += orientation.rotationX;
+	group.position.copy(orientation.position);
+	group.rotation.x = orientation.rotationX;
+	group.rotation.y = orientation.rotationY;
 
-	scene.add(boxGroup);
-	confetti.push({ group: boxGroup, material });
+	scene.add(group);
+	confetti.push({ group, material });
 }
 
 function getConfettiStartOrientation() {
@@ -74,16 +74,16 @@ function getConfettiStartOrientation() {
 			Math.floor(Math.random() * confettiBoxSize.y) + confettiBox.min.y,
 			Math.floor(Math.random() * confettiBoxSize.z) + confettiBox.min.z
 		),
-		rotationX: Math.random(),
-		rotationY: Math.random(),
+		rotationX: Math.random() * Math.PI,
+		rotationY: Math.random() * Math.PI,
 	};
 }
 
 function step(duration) {
 	for (const piece of confetti) {
 		piece.group.position.y += duration * 100;
-		piece.group.rotation.x += duration;
-		piece.group.rotation.y += duration;
+		piece.group.rotation.x += duration * 2;
+		piece.group.rotation.y += duration * 2;
 		if (piece.group.position.y > confettiBox.max.y) {
 			const orientation = getConfettiStartOrientation();
 			piece.group.position.copy(orientation.position);
