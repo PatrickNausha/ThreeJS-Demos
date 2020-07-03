@@ -9,15 +9,18 @@ import {
 	TextGeometry,
 	PlaneGeometry,
 	Box3,
+	Vector2,
 	Vector3,
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import helvetikerRegularJson from "three/examples/fonts/helvetiker_regular.typeface.json"; // TODO: Add font license if published to web. https://github.com/mrdoob/three.js/blob/master/examples/fonts/LICENSE
 import { makeCentered } from "./positioning";
 import { updateStats, toggleStats } from "./debug-stats";
 
-const renderer = new WebGLRenderer({ antialias: true, alpha: true });
-renderer.setClearColor(0x000000, 0);
+const renderer = new WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
@@ -101,6 +104,14 @@ function step(duration) {
 // Show stats
 toggleStats();
 
+// Add render passes
+const composer = new EffectComposer(renderer);
+composer.setSize(window.innerWidth, window.innerHeight);
+const renderPass = new RenderPass(scene, camera);
+composer.addPass(renderPass);
+const bloomPass = new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 1.5, 0.5, 0);
+composer.addPass(bloomPass);
+
 // Main loop
 let lastTimeStamp;
 function animate(timeStamp) {
@@ -112,7 +123,7 @@ function animate(timeStamp) {
 	const duration = timeStamp - lastTimeStamp;
 	step(duration / 1000);
 
-	renderer.render(scene, camera);
+	composer.render(scene, camera);
 	lastTimeStamp = timeStamp;
 	updateStats();
 }
