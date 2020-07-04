@@ -16,7 +16,9 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import helvetikerRegularJson from "three/examples/fonts/helvetiker_regular.typeface.json"; // TODO: Add font license if published to web. https://github.com/mrdoob/three.js/blob/master/examples/fonts/LICENSE
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
+import { FXAAShader } from "three/examples/jsm/shaders/FXAAShader.js";
+import helvetikerRegularJson from "three/examples/fonts/helvetiker_bold.typeface.json"; // TODO: Add font license if published to web. https://github.com/mrdoob/three.js/blob/master/examples/fonts/LICENSE
 import { makeCentered } from "./positioning";
 import { updateStats, toggleStats } from "./debug-stats";
 
@@ -35,7 +37,7 @@ new OrbitControls(camera, renderer.domElement);
 const font = new FontLoader().parse(helvetikerRegularJson);
 const fontGeometry = new TextGeometry("GLOW", {
 	font,
-	size: 40,
+	size: 24,
 	height: 5,
 	curveSegments: 12,
 	bevelEnabled: false,
@@ -107,10 +109,19 @@ toggleStats();
 // Add render passes
 const composer = new EffectComposer(renderer);
 composer.setSize(window.innerWidth, window.innerHeight);
+
 const renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
-const bloomPass = new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 1.5, 0.5, 0);
+
+const bloomPass = new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 0.75, 1, 0);
 composer.addPass(bloomPass);
+
+const fxaaPass = new ShaderPass(FXAAShader);
+const pixelRatio = renderer.getPixelRatio();
+fxaaPass.material.uniforms["resolution"].value.x = 1 / (window.innerWidth * pixelRatio);
+fxaaPass.material.uniforms["resolution"].value.y = 1 / (window.innerHeight * pixelRatio);
+
+composer.addPass(fxaaPass);
 
 // Main loop
 let lastTimeStamp;
