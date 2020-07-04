@@ -33,7 +33,13 @@ const scene = new Scene();
 // Camera
 const camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
 camera.position.z = 200;
-new OrbitControls(camera, renderer.domElement);
+const orbitControls = new OrbitControls(camera, renderer.domElement);
+orbitControls.enableDamping = true;
+orbitControls.enablePan = false;
+orbitControls.maxAzimuthAngle = Math.PI * (1 / 6);
+orbitControls.minAzimuthAngle = -Math.PI * (1 / 6);
+orbitControls.maxPolarAngle = Math.PI * (2 / 3);
+orbitControls.minPolarAngle = Math.PI * (1 / 3);
 
 const font = new FontLoader().parse(helvetikerRegularJson);
 const fontGeometry = new TextGeometry("GLOW", {
@@ -86,6 +92,8 @@ function getConfettiStartOrientation() {
 }
 
 function step(duration) {
+	orbitControls.update(); // Required for damping.
+
 	for (const piece of confetti) {
 		piece.group.position.y += duration * 100;
 		piece.group.rotation.x += duration * 2;
