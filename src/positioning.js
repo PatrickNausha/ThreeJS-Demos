@@ -9,7 +9,7 @@ export function slamItOnTheGround(mesh, x, z, groundLevel) {
 	mesh.position.z = z;
 }
 
-export function makeCentered(mesh, centerPoint) {
+export function makeCentered(mesh) {
 	if (!mesh.geometry.boundingBox) {
 		mesh.geometry.computeBoundingBox();
 	}
