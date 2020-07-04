@@ -40,6 +40,8 @@ orbitControls.maxAzimuthAngle = Math.PI * (1 / 6);
 orbitControls.minAzimuthAngle = -Math.PI * (1 / 6);
 orbitControls.maxPolarAngle = Math.PI * (2 / 3);
 orbitControls.minPolarAngle = Math.PI * (1 / 3);
+orbitControls.minDistance = 100;
+orbitControls.maxDistance = 280;
 
 const font = new FontLoader().parse(helvetikerRegularJson);
 const fontGeometry = new TextGeometry("GLOW", {
