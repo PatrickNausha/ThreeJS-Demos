@@ -24,6 +24,7 @@ import { updateStats, toggleStats } from "./debug-stats";
 
 const renderer = new WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0x070b34);
 document.body.appendChild(renderer.domElement);
 
 // In the beginning ...
@@ -113,7 +114,7 @@ composer.setSize(window.innerWidth, window.innerHeight);
 const renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
 
-const bloomPass = new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 0.75, 1, 0);
+const bloomPass = new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 0.75, 1, 0.1);
 composer.addPass(bloomPass);
 
 const fxaaPass = new ShaderPass(FXAAShader);
