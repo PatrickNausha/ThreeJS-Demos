@@ -23,6 +23,7 @@ import { makeCentered } from "./positioning";
 import { updateStats, toggleStats } from "./debug-stats";
 
 const renderer = new WebGLRenderer();
+renderer.setPixelRatio(window.devicePixelRatio || 1);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(0x070b34);
 document.body.appendChild(renderer.domElement);
@@ -33,6 +34,7 @@ const scene = new Scene();
 // Camera
 const camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
 camera.position.z = 200;
+camera.position.y = -48;
 const orbitControls = new OrbitControls(camera, renderer.domElement);
 orbitControls.enableDamping = true;
 orbitControls.enablePan = false;
