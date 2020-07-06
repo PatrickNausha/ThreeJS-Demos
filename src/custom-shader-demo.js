@@ -15,12 +15,14 @@ const camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight,
 camera.position.x = 3;
 camera.position.y = 3;
 camera.position.z = 3;
-const controls = new OrbitControls(camera, renderer.domElement);
+new OrbitControls(camera, renderer.domElement);
 
+const uniforms = {
+	time: { value: 1.0 },
+	scanLineWidth: { value: 3 },
+};
 const material = new ShaderMaterial({
-	uniforms: {
-		time: { value: 1.0 },
-	},
+	uniforms,
 
 	vertexShader: `
 		varying vec2 vUv;
@@ -33,12 +35,15 @@ const material = new ShaderMaterial({
 			gl_Position = projectionMatrix * mvPosition;
 		}`,
 	fragmentShader: `
-		uniform float time;
+		uniform float scanLineWidth;
 		varying vec2 vUv;	// Interpolated UV coordinate passed in from vertex shader
 		varying vec3 vNormal;	// Interpolated Normal vector passed in from vertex shader
 
 		void main() {
-			gl_FragColor = vec4((vNormal.x + 1.0) / 2.0, (vNormal.y + 1.0) / 2.0, (vNormal.z + 1.0) / 2.0, 1.0);
+			float lightingBrightness = dot(vNormal, vec3(1, 0.7, 0.1));	// Poor man's lighting
+			float scanLineMultiplier = abs(sin(gl_FragCoord.y / scanLineWidth)) + 0.3;
+			float brightness = lightingBrightness * scanLineMultiplier;
+			gl_FragColor = vec4(brightness, brightness, brightness, 1.0);
 		}
 	`,
 });
