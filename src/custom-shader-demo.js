@@ -47,8 +47,13 @@ const material = new ShaderMaterial({
 
 		void main() {
 			float lightingBrightness = dot(vNormal, vec3(1, 0.7, 0.1));	// Poor man's lighting
+
+			// For some "noise," use an exponential sin-based equation with some prime numbers thrown in.
+			float adderX = (gl_FragCoord.y + time * scanLineSpeed * 40.0) / (scanLineWidth * 10.0);
+			float constructiveInterference = 0.95 * sin(adderX) * sin(adderX / 3.0) * sin(adderX / 13.0) / 3.0;
+
 			float scanLineMultiplier = min(abs(sin(gl_FragCoord.y * scanLineWidth - time * scanLineSpeed)) + 0.5, 1.0);
-			float brightness = lightingBrightness * scanLineMultiplier;
+			float brightness = lightingBrightness * scanLineMultiplier + constructiveInterference;
 			gl_FragColor = vec4(brightness, brightness, brightness, 1.0);
 		}
 	`,
