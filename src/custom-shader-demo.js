@@ -1,4 +1,4 @@
-import { Scene, PerspectiveCamera, WebGLRenderer, ShaderMaterial, Mesh, BoxGeometry, Vector2 } from "three";
+import { Scene, PerspectiveCamera, WebGLRenderer, ShaderMaterial, Mesh, BoxGeometry, Vector2, Color } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { updateStats, toggleStats } from "./debug-stats";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
@@ -9,8 +9,9 @@ import { FXAAShader } from "three/examples/jsm/shaders/FXAAShader.js";
 
 const renderer = new WebGLRenderer({ antialias: true });
 const devicePixelRatio = window.devicePixelRatio || 1;
+const clearColor = new Color(0.07, 0.07, 0.15);
 renderer.setPixelRatio();
-renderer.setClearColor(0x111122);
+renderer.setClearColor(clearColor);
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
@@ -19,7 +20,6 @@ const scene = new Scene();
 
 // Camera
 const camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-console.log(camera.projectionMatrix);
 camera.position.x = 3;
 camera.position.y = 3;
 camera.position.z = 3;
@@ -29,6 +29,7 @@ const uniforms = {
 	time: { value: 1.0 },
 	scanLineWidth: { value: 3 * devicePixelRatio },
 	scanLineSpeed: { value: 10 },
+	clearColor: { value: clearColor },
 };
 const material = new ShaderMaterial({
 	uniforms,
@@ -48,6 +49,7 @@ const material = new ShaderMaterial({
 		uniform float scanLineSpeed;
 		uniform float devicePixelRatio;
 		uniform float time;
+		uniform vec3 clearColor;
 		varying vec2 vUv;	// Interpolated UV coordinate passed in from vertex shader
 		varying vec3 vNormal;	// Interpolated Normal vector passed in from vertex shader
 
@@ -66,7 +68,12 @@ const material = new ShaderMaterial({
 			float scanLineMultiplier = min(abs(sin(gl_FragCoord.y * scanLineWidth - time * scanLineSpeed)) + 0.5, 1.0);
 			float filmGrain = random(gl_FragCoord.xy / 100.0 * time) / 2.0;
 			float brightness = (lightingBrightness + constructiveInterference) * scanLineMultiplier + filmGrain;
-			gl_FragColor = vec4(0.1, 0.2, 1.0, brightness);
+
+			// We want to occlude ourselves, so let's cheat instead of using opacity. This demo only has holograms on screen
+			// so we can just interpolate between desired color and clear color :)
+			vec3 color = mix(clearColor.xyz, vec3(0.1, 0.2, 1.0), brightness);
+			
+			gl_FragColor = vec4(color, 1.0);
 		}
 	`,
 });
