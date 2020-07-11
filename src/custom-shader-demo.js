@@ -39,7 +39,7 @@ new OrbitControls(camera, renderer.domElement);
 
 const uniforms = {
 	time: { value: 1.0 },
-	scanLineWidth: { value: 3 * devicePixelRatio },
+	scanLineWidth: { value: 5.0 * devicePixelRatio },
 	scanLineSpeed: { value: 10 },
 	clearColor: { value: clearColor },
 	lightingIntensity: { value: 2.0 },
