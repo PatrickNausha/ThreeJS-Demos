@@ -1,4 +1,15 @@
-import { Scene, PerspectiveCamera, WebGLRenderer, ShaderMaterial, Mesh, BoxGeometry, Vector2, Color } from "three";
+import {
+	Scene,
+	PerspectiveCamera,
+	WebGLRenderer,
+	ShaderMaterial,
+	Mesh,
+	BoxGeometry,
+	SphereGeometry,
+	Vector2,
+	Color,
+	TorusKnotGeometry,
+} from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { updateStats, toggleStats } from "./debug-stats";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
@@ -20,9 +31,9 @@ const scene = new Scene();
 
 // Camera
 const camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.x = 3;
-camera.position.y = 3;
-camera.position.z = 3;
+camera.position.x = 0;
+camera.position.y = 5;
+camera.position.z = 10;
 new OrbitControls(camera, renderer.domElement);
 
 const uniforms = {
@@ -59,7 +70,7 @@ const material = new ShaderMaterial({
 		}
 
 		void main() {
-			float lightingBrightness = max(dot(vNormal, vec3(1, 0.7, 0.1)), 0.0);	// Poor man's lighting
+			float lightingBrightness = max(dot(vNormal, vec3(0.7, 0.5, 1)), 0.0);	// Poor man's lighting
 
 			// For some "noise," use an exponential sin-based equation with some prime numbers thrown in.
 			float adderX = (gl_FragCoord.y + time * scanLineSpeed * 40.0) / (scanLineWidth * 10.0);
@@ -78,8 +89,16 @@ const material = new ShaderMaterial({
 	`,
 });
 
-const box = new Mesh(new BoxGeometry(2, 2, 2), material);
+const box = new Mesh(new BoxGeometry(2, 2, 2, 20, 20), material);
+box.position.x = -4;
 scene.add(box);
+
+const sphere = new Mesh(new SphereGeometry(1.2, 22, 22), material);
+scene.add(sphere);
+
+const knot = new Mesh(new TorusKnotGeometry(1, 0.34), material);
+knot.position.x = 4;
+scene.add(knot);
 
 // Show stats
 toggleStats();
@@ -91,7 +110,7 @@ composer.setSize(window.innerWidth, window.innerHeight);
 const renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
 
-const bloomPass = new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 0.75, 1, 0.2);
+const bloomPass = new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 0.5, 1, 0.2);
 composer.addPass(bloomPass);
 
 const fxaaPass = new ShaderPass(FXAAShader);
