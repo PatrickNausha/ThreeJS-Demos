@@ -72,9 +72,12 @@ const material = new ShaderMaterial({
 		void main() {
 			float lightingBrightness = max(dot(vNormal, vec3(0.7, 0.5, 1)), 0.0);	// Poor man's lighting
 
-			// For some "noise," use an exponential sin-based equation with some prime numbers thrown in.
-			float adderX = (gl_FragCoord.y + time * scanLineSpeed * 40.0) / (scanLineWidth * 10.0);
-			float constructiveInterference = 0.95 * sin(adderX) * sin(adderX / 3.0) * sin(adderX / 13.0) / 3.0;
+			// For some "noise," use an exponential sin-based equation.
+			float verticalNoiseFrameRate = 16.0;
+			float verticalNoiseSpeed = 32.0;
+			float adderX = (gl_FragCoord.y + floor(time * verticalNoiseFrameRate) * verticalNoiseSpeed) / 20.0;
+			float constructiveInterferenceStrength = mix(0.0, 0.25, 0.75 + sin(3.1416 * fract(time * verticalNoiseFrameRate)) * 0.25);
+			float constructiveInterference = pow(100.0, sin(adderX) * sin(adderX / 3.0) * sin(adderX / 13.0)) / 100.0 * constructiveInterferenceStrength;
 
 			float scanLineMultiplier = min(abs(sin(gl_FragCoord.y * scanLineWidth - time * scanLineSpeed)) + 0.5, 1.0);
 			float filmGrain = random(gl_FragCoord.xy / 100.0 * time) / 2.0;
