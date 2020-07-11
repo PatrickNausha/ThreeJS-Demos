@@ -10,6 +10,7 @@ import {
 	Color,
 	TorusKnotGeometry,
 } from "three";
+import { GUI } from "dat.gui";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { updateStats, toggleStats } from "./debug-stats";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
@@ -41,6 +42,8 @@ const uniforms = {
 	scanLineWidth: { value: 3 * devicePixelRatio },
 	scanLineSpeed: { value: 10 },
 	clearColor: { value: clearColor },
+	lightingIntensity: { value: 2.0 },
+	filmGrainIntensity: { value: 0.5 },
 };
 const material = new ShaderMaterial({
 	uniforms,
@@ -59,8 +62,10 @@ const material = new ShaderMaterial({
 		uniform float scanLineWidth;
 		uniform float scanLineSpeed;
 		uniform float devicePixelRatio;
+		uniform float filmGrainIntensity;
 		uniform float time;
 		uniform vec3 clearColor;
+		uniform float lightingIntensity;
 		varying vec2 vUv;	// Interpolated UV coordinate passed in from vertex shader
 		varying vec3 vNormal;	// Interpolated Normal vector passed in from vertex shader
 
@@ -70,7 +75,7 @@ const material = new ShaderMaterial({
 		}
 
 		void main() {
-			float lightingBrightness = max(dot(vNormal, vec3(0.7, 0.5, 1)), 0.0);	// Poor man's lighting
+			float lightingBrightness = smoothstep(0.0, 1.0, max(dot(vNormal, normalize(vec3(0.7, 0.5, 1))), 0.0)) * lightingIntensity;	// Poor man's lighting
 
 			// For some "noise," use an exponential sin-based equation.
 			float verticalNoiseFrameRate = 16.0;
@@ -80,7 +85,7 @@ const material = new ShaderMaterial({
 			float constructiveInterference = pow(100.0, sin(adderX) * sin(adderX / 3.0) * sin(adderX / 13.0)) / 100.0 * constructiveInterferenceStrength;
 
 			float scanLineMultiplier = min(abs(sin(gl_FragCoord.y * scanLineWidth - time * scanLineSpeed)) + 0.5, 1.0);
-			float filmGrain = random(gl_FragCoord.xy / 100.0 * time) / 2.0;
+			float filmGrain = random(gl_FragCoord.xy / 100.0 * time) * filmGrainIntensity;
 			float brightness = (lightingBrightness + constructiveInterference) * scanLineMultiplier + filmGrain;
 
 			// We want to occlude ourselves, so let's cheat instead of using opacity. This demo only has holograms on screen
@@ -99,9 +104,26 @@ scene.add(box);
 const sphere = new Mesh(new SphereGeometry(1.2, 22, 22), material);
 scene.add(sphere);
 
-const knot = new Mesh(new TorusKnotGeometry(1, 0.34), material);
+const knot = new Mesh(new TorusKnotGeometry(1, 0.34, 128, 16), material);
 knot.position.x = 4;
 scene.add(knot);
+
+// GUI
+const gui = new GUI();
+const guiParams = {
+	lightingIntensity: uniforms.lightingIntensity.value,
+	scanLineSpeed: uniforms.scanLineSpeed.value,
+	filmGrainIntensity: uniforms.filmGrainIntensity.value,
+};
+gui.add(guiParams, "lightingIntensity", 0, 10).onChange((value) => {
+	material.uniforms.lightingIntensity.value = value;
+});
+gui.add(guiParams, "scanLineSpeed", 0, 100).onChange((value) => {
+	material.uniforms.scanLineSpeed.value = value;
+});
+gui.add(guiParams, "filmGrainIntensity", 0, 10).onChange((value) => {
+	material.uniforms.filmGrainIntensity.value = value;
+});
 
 // Show stats
 toggleStats();
