@@ -48,14 +48,12 @@ const uniforms = {
 const material = new ShaderMaterial({
 	uniforms,
 	vertexShader: `
-		varying vec2 vUv;
 		varying vec3 vNormal;
 		uniform mat4 inverseViewMatrix;
 		uniform float time;
 
 		void main()
 		{
-			vUv = uv;
 			vNormal = normal;
 			float viewSpaceY = (modelViewMatrix * vec4(position, 1.0)).y;
 			float constructiveInterference = 0.0;
@@ -76,7 +74,6 @@ const material = new ShaderMaterial({
 		uniform float time;
 		uniform vec3 clearColor;
 		uniform float lightingIntensity;
-		varying vec2 vUv;	// Interpolated UV coordinate passed in from vertex shader
 		varying vec3 vNormal;	// Interpolated Normal vector passed in from vertex shader
 
 		// Psuedo-random generator from https://thebookofshaders.com/10/
