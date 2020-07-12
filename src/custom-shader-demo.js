@@ -44,6 +44,7 @@ const uniforms = {
 	clearColor: { value: clearColor },
 	lightingIntensity: { value: 3.0 },
 	filmGrainIntensity: { value: 0.5 },
+	resolution: { value: new Vector2(window.innerWidth * devicePixelRatio, window.innerHeight * devicePixelRatio) },
 };
 const material = new ShaderMaterial({
 	uniforms,
@@ -73,6 +74,7 @@ const material = new ShaderMaterial({
 		uniform float filmGrainIntensity;
 		uniform float time;
 		uniform vec3 clearColor;
+		uniform vec2 resolution;
 		uniform float lightingIntensity;
 		varying vec3 vNormal;	// Interpolated Normal vector passed in from vertex shader
 
@@ -92,7 +94,7 @@ const material = new ShaderMaterial({
 			float constructiveInterference = pow(100.0, sin(adderX) * sin(adderX / 3.0) * sin(adderX / 13.0)) / 100.0 * constructiveInterferenceStrength;
 
 			float scanLineMultiplier = min(abs(sin(gl_FragCoord.y * scanLineWidth - time * scanLineSpeed)) + 0.5, 1.0);
-			float filmGrain = random(gl_FragCoord.xy / 100.0 * time) * filmGrainIntensity;
+			float filmGrain = random(gl_FragCoord.xy / resolution + fract(time)) * filmGrainIntensity;
 			float brightness = (lightingBrightness + constructiveInterference) * scanLineMultiplier + filmGrain;
 
 			// We want to occlude ourselves, so let's cheat instead of using opacity. This demo only has holograms on screen
