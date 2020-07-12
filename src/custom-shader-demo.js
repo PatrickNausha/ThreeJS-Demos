@@ -51,11 +51,19 @@ const material = new ShaderMaterial({
 	vertexShader: `
 		varying vec2 vUv;
 		varying vec3 vNormal;
+		uniform mat4 inverseViewMatrix;
+		uniform float time;
+
 		void main()
 		{
 			vUv = uv;
 			vNormal = normal;
-			vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+			float viewSpaceY = (modelViewMatrix * vec4(position, 1.0)).y;
+			float constructiveInterference = 2.0; // pow(100.0, sin(time * 5.0) * sin(time * 5.0 / 3.0) * sin(time * 5.0 / 13.0)) / 10.0;
+			float x = viewSpaceY * 25.0 + time * 20.0;
+			vec4 noiseShift = inverseViewMatrix * vec4(constructiveInterference * sin(x / 3.0) * sin(x / 13.0), 0.0, 0.0, 0.0);
+			vec3 shiftedPosition = noiseShift.xyz / 7.0 + position;
+			vec4 mvPosition = modelViewMatrix * vec4(shiftedPosition, 1.0);
 			gl_Position = projectionMatrix * mvPosition;
 		}`,
 	fragmentShader: `
@@ -97,7 +105,7 @@ const material = new ShaderMaterial({
 	`,
 });
 
-const box = new Mesh(new BoxGeometry(2, 2, 2, 20, 20), material);
+const box = new Mesh(new BoxGeometry(2, 2, 2, 20, 20, 20), material);
 box.position.x = -4;
 scene.add(box);
 
@@ -147,6 +155,7 @@ composer.addPass(fxaaPass);
 // Main loop
 function animate(time) {
 	const timeSeconds = time / 1000;
+	uniforms.inverseViewMatrix = { value: camera.matrixWorld };
 	uniforms.time.value = timeSeconds;
 	requestAnimationFrame(animate);
 	composer.render(scene, camera);
