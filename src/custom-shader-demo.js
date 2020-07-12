@@ -42,7 +42,7 @@ const uniforms = {
 	scanLineWidth: { value: 5.0 * devicePixelRatio },
 	scanLineSpeed: { value: 10 },
 	clearColor: { value: clearColor },
-	lightingIntensity: { value: 2.0 },
+	lightingIntensity: { value: 3.0 },
 	filmGrainIntensity: { value: 0.5 },
 };
 const material = new ShaderMaterial({
