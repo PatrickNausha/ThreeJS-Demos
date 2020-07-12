@@ -33,7 +33,7 @@ const scene = new Scene();
 // Camera
 const camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.x = 0;
-camera.position.y = 5;
+camera.position.y = 2;
 camera.position.z = 10;
 new OrbitControls(camera, renderer.domElement);
 
