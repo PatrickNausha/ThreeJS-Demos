@@ -47,7 +47,6 @@ const uniforms = {
 };
 const material = new ShaderMaterial({
 	uniforms,
-	transparent: true,
 	vertexShader: `
 		varying vec2 vUv;
 		varying vec3 vNormal;
@@ -59,8 +58,11 @@ const material = new ShaderMaterial({
 			vUv = uv;
 			vNormal = normal;
 			float viewSpaceY = (modelViewMatrix * vec4(position, 1.0)).y;
-			float constructiveInterference = 2.0; // pow(100.0, sin(time * 5.0) * sin(time * 5.0 / 3.0) * sin(time * 5.0 / 13.0)) / 10.0;
-			float x = viewSpaceY * 25.0 + time * 20.0;
+			float constructiveInterference = 0.0;
+			if (fract(time / 3.0) > 0.95) {
+				constructiveInterference = 2.0;
+			}
+			float x = viewSpaceY * 25.0 + time * 80.0;
 			vec4 noiseShift = inverseViewMatrix * vec4(constructiveInterference * sin(x / 3.0) * sin(x / 13.0), 0.0, 0.0, 0.0);
 			vec3 shiftedPosition = noiseShift.xyz / 7.0 + position;
 			vec4 mvPosition = modelViewMatrix * vec4(shiftedPosition, 1.0);
