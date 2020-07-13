@@ -22,7 +22,7 @@ import { FXAAShader } from "three/examples/jsm/shaders/FXAAShader.js";
 const renderer = new WebGLRenderer({ antialias: true });
 const devicePixelRatio = window.devicePixelRatio || 1;
 const clearColor = new Color(0.07, 0.07, 0.15);
-renderer.setPixelRatio();
+renderer.setPixelRatio(devicePixelRatio);
 renderer.setClearColor(clearColor);
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
@@ -39,7 +39,7 @@ new OrbitControls(camera, renderer.domElement);
 
 const uniforms = {
 	time: { value: 1.0 },
-	scanLineWidth: { value: 5.0 * devicePixelRatio },
+	scanLineWidth: { value: 100.0 },
 	scanLineSpeed: { value: 10 },
 	clearColor: { value: clearColor },
 	lightingIntensity: { value: 3.0 },
@@ -70,7 +70,6 @@ const material = new ShaderMaterial({
 	fragmentShader: `
 		uniform float scanLineWidth;
 		uniform float scanLineSpeed;
-		uniform float devicePixelRatio;
 		uniform float filmGrainIntensity;
 		uniform float time;
 		uniform vec3 clearColor;
