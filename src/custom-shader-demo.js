@@ -9,6 +9,7 @@ import {
 	Vector2,
 	Color,
 	TorusKnotGeometry,
+	Vector3,
 } from "three";
 import { GUI } from "dat.gui";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
@@ -41,12 +42,14 @@ const uniforms = {
 	time: { value: 1.0 },
 	scanLineWidth: { value: 100.0 },
 	scanLineSpeed: { value: 10 },
-	clearColor: { value: clearColor },
-	lightingIntensity: { value: 3.0 },
+	color: { value: new Vector3(0.07, 0.07, 0.15) },
+	lightingIntensity: { value: 4.0 },
 	filmGrainIntensity: { value: 0.5 },
 	resolution: { value: new Vector2(window.innerWidth * devicePixelRatio, window.innerHeight * devicePixelRatio) },
+	opacity: { value: 0.8 },
 };
 const material = new ShaderMaterial({
+	transparent: true,
 	uniforms,
 	vertexShader: `
 		varying vec3 vNormal;
@@ -72,7 +75,8 @@ const material = new ShaderMaterial({
 		uniform float scanLineSpeed;
 		uniform float filmGrainIntensity;
 		uniform float time;
-		uniform vec3 clearColor;
+		uniform vec3 color;
+		uniform float opacity;
 		uniform vec2 resolution;
 		uniform float lightingIntensity;
 		varying vec3 vNormal;	// Interpolated Normal vector passed in from vertex shader
@@ -96,11 +100,9 @@ const material = new ShaderMaterial({
 			float filmGrain = random(gl_FragCoord.xy / resolution + fract(time)) * filmGrainIntensity;
 			float brightness = (lightingBrightness + constructiveInterference) * scanLineMultiplier + filmGrain;
 
-			// We want to occlude ourselves, so let's cheat instead of using opacity. This demo only has holograms on screen
-			// so we can just interpolate between desired color and clear color :)
-			vec3 color = mix(clearColor.xyz, vec3(0.1, 0.2, 1.0), brightness);
+			vec3 fragColor = mix(color.xyz, vec3(0.1, 0.2, 1.0), brightness);
 			
-			gl_FragColor = vec4(color, 1.0);
+			gl_FragColor = vec4(fragColor, opacity);
 		}
 	`,
 });
@@ -115,23 +117,6 @@ scene.add(sphere);
 const knot = new Mesh(new TorusKnotGeometry(1, 0.34, 128, 16), material);
 knot.position.x = 4;
 scene.add(knot);
-
-// GUI
-const gui = new GUI();
-const guiParams = {
-	lightingIntensity: uniforms.lightingIntensity.value,
-	scanLineSpeed: uniforms.scanLineSpeed.value,
-	filmGrainIntensity: uniforms.filmGrainIntensity.value,
-};
-gui.add(guiParams, "lightingIntensity", 0, 10).onChange((value) => {
-	material.uniforms.lightingIntensity.value = value;
-});
-gui.add(guiParams, "scanLineSpeed", 0, 100).onChange((value) => {
-	material.uniforms.scanLineSpeed.value = value;
-});
-gui.add(guiParams, "filmGrainIntensity", 0, 10).onChange((value) => {
-	material.uniforms.filmGrainIntensity.value = value;
-});
 
 // Show stats
 toggleStats();
@@ -151,6 +136,31 @@ const pixelRatio = renderer.getPixelRatio();
 fxaaPass.material.uniforms["resolution"].value.x = 1 / (window.innerWidth * pixelRatio);
 fxaaPass.material.uniforms["resolution"].value.y = 1 / (window.innerHeight * pixelRatio);
 composer.addPass(fxaaPass);
+
+// GUI
+const gui = new GUI();
+const guiParams = {
+	lightingIntensity: uniforms.lightingIntensity.value,
+	scanLineSpeed: uniforms.scanLineSpeed.value,
+	filmGrainIntensity: uniforms.filmGrainIntensity.value,
+	bloom: bloomPass.enabled,
+	opacity: uniforms.opacity.value,
+};
+gui.add(guiParams, "lightingIntensity", 0, 10).onChange((value) => {
+	material.uniforms.lightingIntensity.value = value;
+});
+gui.add(guiParams, "scanLineSpeed", 0, 100).onChange((value) => {
+	material.uniforms.scanLineSpeed.value = value;
+});
+gui.add(guiParams, "filmGrainIntensity", 0, 10).onChange((value) => {
+	material.uniforms.filmGrainIntensity.value = value;
+});
+gui.add(guiParams, "opacity", 0, 1).onChange((value) => {
+	material.uniforms.opacity.value = value;
+});
+gui.add(guiParams, "bloom").onChange((value) => {
+	bloomPass.enabled = value;
+});
 
 // Main loop
 function animate(time) {
