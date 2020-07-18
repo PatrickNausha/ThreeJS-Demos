@@ -47,6 +47,7 @@ const uniforms = {
 	filmGrainIntensity: { value: 0.5 },
 	resolution: { value: new Vector2(window.innerWidth * devicePixelRatio, window.innerHeight * devicePixelRatio) },
 	opacity: { value: 0.8 },
+	smoothStepLighting: { value: true },
 };
 const material = new ShaderMaterial({
 	transparent: true,
@@ -79,6 +80,7 @@ const material = new ShaderMaterial({
 		uniform float opacity;
 		uniform vec2 resolution;
 		uniform float lightingIntensity;
+		uniform bool smoothStepLighting;
 		varying vec3 vNormal;	// Interpolated Normal vector passed in from vertex shader
 
 		// Psuedo-random generator from https://thebookofshaders.com/10/
@@ -87,18 +89,23 @@ const material = new ShaderMaterial({
 		}
 
 		void main() {
-			float lightingBrightness = smoothstep(0.0, 1.0, max(dot(vNormal, normalize(vec3(0.7, 0.5, 1))), 0.0)) * lightingIntensity;	// Poor man's lighting
+			// Some basic Lambertian-ish reflectance.
+			vec3 lightDirection = normalize(vec3(0.7, 0.5, 1.0));
+			float diffuse = max(dot(vNormal, lightDirection), 0.0);
+			if (smoothStepLighting)
+				diffuse = smoothstep(0.0, 1.0, diffuse);
+			diffuse *= lightingIntensity;
 
-			// For some "noise," use an exponential sin-based equation.
+			// Use a "spikey" sign equation shifted by time for some moving glowing noise bars.
 			float verticalNoiseFrameRate = 16.0;
 			float verticalNoiseSpeed = 32.0;
 			float adderX = (gl_FragCoord.y + floor(time * verticalNoiseFrameRate) * verticalNoiseSpeed) / 20.0;
-			float constructiveInterferenceStrength = mix(0.0, 0.25, 0.75 + sin(3.1416 * fract(time * verticalNoiseFrameRate)) * 0.25);
-			float constructiveInterference = pow(100.0, sin(adderX) * sin(adderX / 3.0) * sin(adderX / 13.0)) / 100.0 * constructiveInterferenceStrength;
+			float verticalNoiseStrength = mix(0.0, 0.25, 0.75 + sin(3.1416 * fract(time * verticalNoiseFrameRate)) * 0.25);
+			float verticalNoise = pow(100.0, sin(adderX) * sin(adderX / 3.0) * sin(adderX / 13.0)) / 100.0 * verticalNoiseStrength;
 
 			float scanLineMultiplier = min(abs(sin(gl_FragCoord.y * scanLineWidth - time * scanLineSpeed)) + 0.5, 1.0);
 			float filmGrain = random(gl_FragCoord.xy / resolution + fract(time)) * filmGrainIntensity;
-			float brightness = (lightingBrightness + constructiveInterference) * scanLineMultiplier + filmGrain;
+			float brightness = (diffuse + verticalNoise) * scanLineMultiplier + filmGrain;
 
 			vec3 fragColor = mix(color.xyz, vec3(0.1, 0.2, 1.0), brightness);
 			
@@ -146,6 +153,7 @@ const guiParams = {
 	bloom: bloomPass.enabled,
 	"anti-aliasing": fxaaPass.enabled,
 	opacity: uniforms.opacity.value,
+	smoothStepLighting: uniforms.smoothStepLighting.value,
 };
 gui.add(guiParams, "lightingIntensity", 0, 10).onChange((value) => {
 	material.uniforms.lightingIntensity.value = value;
@@ -164,6 +172,9 @@ gui.add(guiParams, "bloom").onChange((value) => {
 });
 gui.add(guiParams, "anti-aliasing").onChange((value) => {
 	fxaaPass.enabled = value;
+});
+gui.add(guiParams, "smoothStepLighting").onChange((value) => {
+	material.uniforms.smoothStepLighting.value = value;
 });
 
 // Main loop
