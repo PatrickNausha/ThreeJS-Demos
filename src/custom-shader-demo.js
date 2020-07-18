@@ -44,7 +44,7 @@ const uniforms = {
 	scanLineSpeed: { value: 0 },
 	color: { value: new Vector3(0.07, 0.07, 0.15) },
 	lightingIntensity: { value: 4.0 },
-	filmGrainIntensity: { value: 0.075 },
+	filmGrainIntensity: { value: 0.15 },
 	resolution: { value: new Vector2(window.innerWidth * devicePixelRatio, window.innerHeight * devicePixelRatio) },
 	opacity: { value: 0.8 },
 	smoothStepLighting: { value: true },
@@ -110,7 +110,7 @@ const material = new ShaderMaterial({
 
 			float filmGrain = (2.0 * random(gl_FragCoord.xy / resolution + fract(time)) - 1.0) * filmGrainIntensity;
 
-			vec3 fragColor = (mix(color.xyz, vec3(0.1, 0.2, 1.0), brightness) * exposure + filmGrain) * scanLineMultiplier;
+			vec3 fragColor = ((mix(color.xyz, vec3(0.1, 0.2, 1.0), brightness) * exposure) + filmGrain) * scanLineMultiplier;
 			
 			gl_FragColor = vec4(fragColor, opacity);
 		}
