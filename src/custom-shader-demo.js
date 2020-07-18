@@ -41,6 +41,7 @@ new OrbitControls(camera, renderer.domElement);
 const uniforms = {
 	time: { value: 1.0 },
 	scanLineScale: { value: 1.0 / devicePixelRatio },
+	scanLineIntensity: { value: 0.75 },
 	scanLineSpeed: { value: 0 },
 	color: { value: new Vector3(0.07, 0.07, 0.15) },
 	lightingIntensity: { value: 4.0 },
@@ -74,6 +75,7 @@ const material = new ShaderMaterial({
 		}`,
 	fragmentShader: `
 		uniform float scanLineScale;
+		uniform float scanLineIntensity;
 		uniform float scanLineSpeed;
 		uniform float filmGrainIntensity;
 		uniform float time;
@@ -105,9 +107,10 @@ const material = new ShaderMaterial({
 			float verticalNoiseStrength = mix(0.1875, 0.25, sin(3.1416 * fract(time * verticalNoiseFrameRate)));
 			float verticalNoise = pow(100.0, sin(adderX) * sin(adderX / 3.0) * sin(adderX / 13.0)) / 100.0 * verticalNoiseStrength;
 
-			float scanLineMultiplier = min(abs(sin(gl_FragCoord.y * scanLineScale * 3.14159265359 * 0.25 - time * scanLineSpeed)), 1.0);
-			float brightness = diffuse + verticalNoise;
+			float scanLineMultiplier = mix(1.0 - scanLineIntensity, 1.0, min(abs(sin(gl_FragCoord.y * scanLineScale * 3.14159265359 * 0.25 - time * scanLineSpeed)), 1.0));
 
+			float brightness = diffuse + verticalNoise;
+			
 			float filmGrain = (2.0 * random(gl_FragCoord.xy / resolution + fract(time)) - 1.0) * filmGrainIntensity;
 
 			vec3 fragColor = ((mix(color.xyz, vec3(0.1, 0.2, 1.0), brightness) * exposure) + filmGrain) * scanLineMultiplier;
@@ -155,6 +158,7 @@ const guiParams = {
 	scanLineSpeed: uniforms.scanLineSpeed.value,
 	filmGrainIntensity: uniforms.filmGrainIntensity.value,
 	scanLineScale: uniforms.scanLineScale.value,
+	scanLineIntensity: uniforms.scanLineIntensity.value,
 	bloom: bloomPass.enabled,
 	"anti-aliasing": fxaaPass.enabled,
 	opacity: uniforms.opacity.value,
@@ -186,6 +190,9 @@ gui.add(guiParams, "smoothStepLighting").onChange((value) => {
 });
 gui.add(guiParams, "scanLineScale", 0, 1).onChange((value) => {
 	material.uniforms.scanLineScale.value = value;
+});
+gui.add(guiParams, "scanLineIntensity", 0, 1).onChange((value) => {
+	material.uniforms.scanLineIntensity.value = value;
 });
 
 // Main loop
