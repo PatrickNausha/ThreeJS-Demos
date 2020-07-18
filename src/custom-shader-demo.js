@@ -20,7 +20,7 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import { FXAAShader } from "three/examples/jsm/shaders/FXAAShader.js";
 
-const renderer = new WebGLRenderer({ antialias: true });
+const renderer = new WebGLRenderer();
 const devicePixelRatio = window.devicePixelRatio || 1;
 const clearColor = new Color(0.07, 0.07, 0.15);
 renderer.setPixelRatio(devicePixelRatio);
