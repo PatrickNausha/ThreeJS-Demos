@@ -144,6 +144,7 @@ const guiParams = {
 	scanLineSpeed: uniforms.scanLineSpeed.value,
 	filmGrainIntensity: uniforms.filmGrainIntensity.value,
 	bloom: bloomPass.enabled,
+	"anti-aliasing": fxaaPass.enabled,
 	opacity: uniforms.opacity.value,
 };
 gui.add(guiParams, "lightingIntensity", 0, 10).onChange((value) => {
@@ -160,6 +161,9 @@ gui.add(guiParams, "opacity", 0, 1).onChange((value) => {
 });
 gui.add(guiParams, "bloom").onChange((value) => {
 	bloomPass.enabled = value;
+});
+gui.add(guiParams, "anti-aliasing").onChange((value) => {
+	fxaaPass.enabled = value;
 });
 
 // Main loop
