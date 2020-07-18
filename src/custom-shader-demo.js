@@ -100,7 +100,7 @@ const material = new ShaderMaterial({
 			float verticalNoiseFrameRate = 16.0;
 			float verticalNoiseSpeed = 32.0;
 			float adderX = (gl_FragCoord.y + floor(time * verticalNoiseFrameRate) * verticalNoiseSpeed) / 20.0;
-			float verticalNoiseStrength = mix(0.0, 0.25, 0.75 + sin(3.1416 * fract(time * verticalNoiseFrameRate)) * 0.25);
+			float verticalNoiseStrength = mix(0.1875, 0.25, sin(3.1416 * fract(time * verticalNoiseFrameRate)));
 			float verticalNoise = pow(100.0, sin(adderX) * sin(adderX / 3.0) * sin(adderX / 13.0)) / 100.0 * verticalNoiseStrength;
 
 			float scanLineMultiplier = min(abs(sin(gl_FragCoord.y * scanLineWidth - time * scanLineSpeed)) + 0.5, 1.0);
