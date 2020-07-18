@@ -40,14 +40,15 @@ new OrbitControls(camera, renderer.domElement);
 
 const uniforms = {
 	time: { value: 1.0 },
-	scanLineWidth: { value: 100.0 },
-	scanLineSpeed: { value: 10 },
+	scanLineScale: { value: 1.0 / devicePixelRatio },
+	scanLineSpeed: { value: 0 },
 	color: { value: new Vector3(0.07, 0.07, 0.15) },
 	lightingIntensity: { value: 4.0 },
-	filmGrainIntensity: { value: 0.5 },
+	filmGrainIntensity: { value: 0.075 },
 	resolution: { value: new Vector2(window.innerWidth * devicePixelRatio, window.innerHeight * devicePixelRatio) },
 	opacity: { value: 0.8 },
 	smoothStepLighting: { value: true },
+	exposure: { value: 2.0 },
 };
 const material = new ShaderMaterial({
 	transparent: true,
@@ -72,10 +73,11 @@ const material = new ShaderMaterial({
 			gl_Position = projectionMatrix * mvPosition;
 		}`,
 	fragmentShader: `
-		uniform float scanLineWidth;
+		uniform float scanLineScale;
 		uniform float scanLineSpeed;
 		uniform float filmGrainIntensity;
 		uniform float time;
+		uniform float exposure;
 		uniform vec3 color;
 		uniform float opacity;
 		uniform vec2 resolution;
@@ -103,11 +105,12 @@ const material = new ShaderMaterial({
 			float verticalNoiseStrength = mix(0.1875, 0.25, sin(3.1416 * fract(time * verticalNoiseFrameRate)));
 			float verticalNoise = pow(100.0, sin(adderX) * sin(adderX / 3.0) * sin(adderX / 13.0)) / 100.0 * verticalNoiseStrength;
 
-			float scanLineMultiplier = min(abs(sin(gl_FragCoord.y * scanLineWidth - time * scanLineSpeed)) + 0.5, 1.0);
-			float filmGrain = random(gl_FragCoord.xy / resolution + fract(time)) * filmGrainIntensity;
-			float brightness = (diffuse + verticalNoise) * scanLineMultiplier + filmGrain;
+			float scanLineMultiplier = min(abs(sin(gl_FragCoord.y * scanLineScale * 3.14159265359 * 0.25 - time * scanLineSpeed)), 1.0);
+			float brightness = diffuse + verticalNoise;
 
-			vec3 fragColor = mix(color.xyz, vec3(0.1, 0.2, 1.0), brightness);
+			float filmGrain = (2.0 * random(gl_FragCoord.xy / resolution + fract(time)) - 1.0) * filmGrainIntensity;
+
+			vec3 fragColor = (mix(color.xyz, vec3(0.1, 0.2, 1.0), brightness) * exposure + filmGrain) * scanLineMultiplier;
 			
 			gl_FragColor = vec4(fragColor, opacity);
 		}
@@ -148,8 +151,10 @@ composer.addPass(fxaaPass);
 const gui = new GUI();
 const guiParams = {
 	lightingIntensity: uniforms.lightingIntensity.value,
+	exposure: uniforms.exposure.value,
 	scanLineSpeed: uniforms.scanLineSpeed.value,
 	filmGrainIntensity: uniforms.filmGrainIntensity.value,
+	scanLineScale: uniforms.scanLineScale.value,
 	bloom: bloomPass.enabled,
 	"anti-aliasing": fxaaPass.enabled,
 	opacity: uniforms.opacity.value,
@@ -158,10 +163,13 @@ const guiParams = {
 gui.add(guiParams, "lightingIntensity", 0, 10).onChange((value) => {
 	material.uniforms.lightingIntensity.value = value;
 });
-gui.add(guiParams, "scanLineSpeed", 0, 100).onChange((value) => {
+gui.add(guiParams, "exposure", 0, 10).onChange((value) => {
+	material.uniforms.exposure.value = value;
+});
+gui.add(guiParams, "scanLineSpeed", 0, 30).onChange((value) => {
 	material.uniforms.scanLineSpeed.value = value;
 });
-gui.add(guiParams, "filmGrainIntensity", 0, 10).onChange((value) => {
+gui.add(guiParams, "filmGrainIntensity", 0, 1).onChange((value) => {
 	material.uniforms.filmGrainIntensity.value = value;
 });
 gui.add(guiParams, "opacity", 0, 1).onChange((value) => {
@@ -175,6 +183,9 @@ gui.add(guiParams, "anti-aliasing").onChange((value) => {
 });
 gui.add(guiParams, "smoothStepLighting").onChange((value) => {
 	material.uniforms.smoothStepLighting.value = value;
+});
+gui.add(guiParams, "scanLineScale", 0, 1).onChange((value) => {
+	material.uniforms.scanLineScale.value = value;
 });
 
 // Main loop
