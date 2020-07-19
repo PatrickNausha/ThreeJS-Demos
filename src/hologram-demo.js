@@ -20,7 +20,7 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import { FXAAShader } from "three/examples/jsm/shaders/FXAAShader.js";
 
-const renderer = new WebGLRenderer();
+const renderer = new WebGLRenderer({ alpha: true });
 const devicePixelRatio = window.devicePixelRatio || 1;
 const clearColor = new Color(0.07, 0.07, 0.15);
 renderer.setPixelRatio(devicePixelRatio);
@@ -44,7 +44,7 @@ const uniforms = {
 	scanLineIntensity: { value: 0.75 },
 	scanLineSpeed: { value: 0 },
 	color: { value: new Vector3(0.07, 0.07, 0.15) },
-	lightingIntensity: { value: 4.0 },
+	lightingIntensity: { value: 3.5 },
 	filmGrainIntensity: { value: 0.15 },
 	resolution: { value: new Vector2(window.innerWidth * devicePixelRatio, window.innerHeight * devicePixelRatio) },
 	opacity: { value: 0.8 },
@@ -141,14 +141,16 @@ composer.setSize(window.innerWidth, window.innerHeight);
 const renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
 
-const bloomPass = new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 0.5, 1, 0.2);
+const bloomPass = new UnrealBloomPass(new Vector2(4, 4), 0.5, 1, 0.2);
 composer.addPass(bloomPass);
 
-const fxaaPass = new ShaderPass(FXAAShader);
-const pixelRatio = renderer.getPixelRatio();
-fxaaPass.material.uniforms["resolution"].value.x = 1 / (window.innerWidth * pixelRatio);
-fxaaPass.material.uniforms["resolution"].value.y = 1 / (window.innerHeight * pixelRatio);
-composer.addPass(fxaaPass);
+console.log(renderer.capabilities);
+
+// const fxaaPass = new ShaderPass(FXAAShader);
+// const pixelRatio = renderer.getPixelRatio();
+// fxaaPass.material.uniforms["resolution"].value.x = 1 / (window.innerWidth * pixelRatio);
+// fxaaPass.material.uniforms["resolution"].value.y = 1 / (window.innerHeight * pixelRatio);
+// composer.addPass(fxaaPass);
 
 // GUI
 const gui = new GUI();
@@ -160,7 +162,7 @@ const guiParams = {
 	scanLineScale: uniforms.scanLineScale.value,
 	scanLineIntensity: uniforms.scanLineIntensity.value,
 	bloom: bloomPass.enabled,
-	"anti-aliasing": fxaaPass.enabled,
+	//"anti-aliasing": fxaaPass.enabled,
 	opacity: uniforms.opacity.value,
 	smoothStepLighting: uniforms.smoothStepLighting.value,
 };
@@ -182,9 +184,9 @@ gui.add(guiParams, "opacity", 0, 1).onChange((value) => {
 gui.add(guiParams, "bloom").onChange((value) => {
 	bloomPass.enabled = value;
 });
-gui.add(guiParams, "anti-aliasing").onChange((value) => {
-	fxaaPass.enabled = value;
-});
+// gui.add(guiParams, "anti-aliasing").onChange((value) => {
+// 	fxaaPass.enabled = value;
+// });
 gui.add(guiParams, "smoothStepLighting").onChange((value) => {
 	material.uniforms.smoothStepLighting.value = value;
 });
