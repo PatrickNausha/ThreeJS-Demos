@@ -91,6 +91,13 @@ const material = new ShaderMaterial({
 			return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
 		}
 
+		float getVerticalNoise(float verticalNoiseFrameRate, float verticalNoiseSpeed, float verticalNoiseScale) {
+			float v = gl_FragCoord.y / resolution.y * verticalNoiseScale;
+			float theta = (v + floor(time * verticalNoiseFrameRate) * verticalNoiseSpeed);
+			float verticalNoiseStrength = 1.5;
+			return pow(100.0, sin(theta) * sin(theta / 3.0) * sin(theta / 13.0)) / 100.0 * verticalNoiseStrength;
+		}
+
 		void main() {
 			// Some basic Lambertian-ish reflectance.
 			vec3 lightDirection = normalize(vec3(0.7, 0.5, 1.0));
@@ -100,13 +107,10 @@ const material = new ShaderMaterial({
 			diffuse *= lightingIntensity;
 
 			// Use a "spikey" sine equation shifted by time for some moving glowing noise bars.
-			float verticalNoiseFrameRate = 16.0;
-			float verticalNoiseSpeed = 32.0;
-			float adderX = (gl_FragCoord.y + floor(time * verticalNoiseFrameRate) * verticalNoiseSpeed) / 20.0;
-			float verticalNoiseStrength = mix(0.1875, 0.25, sin(3.1416 * fract(time * verticalNoiseFrameRate)));
-			float verticalNoise = pow(100.0, sin(adderX) * sin(adderX / 3.0) * sin(adderX / 13.0)) / 100.0 * verticalNoiseStrength;
 
 			float scanLineMultiplier = mix(1.0 - scanLineIntensity, 1.0, abs(sin(gl_FragCoord.y * scanLineScale * PI * 0.25)));
+
+			float verticalNoise = getVerticalNoise(12.0, 2.0, 80.0) + getVerticalNoise(8.0, 1.0, 26.0);
 
 			float brightness = diffuse + verticalNoise;
 			
@@ -152,32 +156,34 @@ composer.addPass(fxaaPass);
 // GUI
 const gui = new GUI();
 const guiParams = {
-	lightingIntensity: uniforms.lightingIntensity.value,
-	exposure: uniforms.exposure.value,
-	filmGrainIntensity: uniforms.filmGrainIntensity.value,
+	Intensity: uniforms.lightingIntensity.value,
+	Exposure: uniforms.exposure.value,
+	"Film grain": uniforms.filmGrainIntensity.value,
 	scanLineScale: uniforms.scanLineScale.value,
 	scanLineIntensity: uniforms.scanLineIntensity.value,
 	bloom: bloomPass.enabled,
-	"anti-aliasing": fxaaPass.enabled,
-	opacity: uniforms.opacity.value,
+	"Anti-aliasing": fxaaPass.enabled,
+	Opacity: uniforms.opacity.value,
 	smoothStepLighting: uniforms.smoothStepLighting.value,
 };
-gui.add(guiParams, "lightingIntensity", 0, 10).onChange((value) => {
+const lightingFolder = gui.addFolder("Lighting");
+lightingFolder.add(guiParams, "Intensity", 0, 10).onChange((value) => {
 	material.uniforms.lightingIntensity.value = value;
 });
-gui.add(guiParams, "exposure", 0, 10).onChange((value) => {
+lightingFolder.add(guiParams, "Exposure", 0, 10).onChange((value) => {
 	material.uniforms.exposure.value = value;
 });
-gui.add(guiParams, "filmGrainIntensity", 0, 1).onChange((value) => {
+lightingFolder.open();
+gui.add(guiParams, "Film grain", 0, 1).onChange((value) => {
 	material.uniforms.filmGrainIntensity.value = value;
 });
-gui.add(guiParams, "opacity", 0, 1).onChange((value) => {
+gui.add(guiParams, "Opacity", 0, 1).onChange((value) => {
 	material.uniforms.opacity.value = value;
 });
 gui.add(guiParams, "bloom").onChange((value) => {
 	bloomPass.enabled = value;
 });
-gui.add(guiParams, "anti-aliasing").onChange((value) => {
+gui.add(guiParams, "Anti-aliasing").onChange((value) => {
 	fxaaPass.enabled = value;
 });
 gui.add(guiParams, "smoothStepLighting").onChange((value) => {
