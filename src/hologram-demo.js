@@ -47,7 +47,8 @@ const uniforms = {
 	filmGrainIntensity: { value: 0.15 },
 	resolution: { value: new Vector2(window.innerWidth * devicePixelRatio, window.innerHeight * devicePixelRatio) },
 	opacity: { value: 0.8 },
-	opacityJitterStrength: { value: 0.05 },
+	opacityJitterStrength: { value: 0.1 },
+	opacityJitterSpeed: { value: 30 },
 	smoothStepLighting: { value: true },
 	exposure: { value: 2.0 },
 };
@@ -86,6 +87,7 @@ const material = new ShaderMaterial({
 		uniform float lightingIntensity;
 		uniform bool smoothStepLighting;
 		uniform float opacityJitterStrength;
+		uniform float opacityJitterSpeed;
 		varying vec3 vNormal;	// Interpolated Normal vector passed in from vertex shader
 
 		// Psuedo-random generator from https://thebookofshaders.com/10/
@@ -120,8 +122,8 @@ const material = new ShaderMaterial({
 
 			vec3 fragColor = ((mix(color.xyz, vec3(0.1, 0.2, 1.0), brightness) * exposure) + filmGrain) * scanLineMultiplier;
 
-			float theta = time * 30.0;
-			float opacityJitter = sin(theta) * opacityJitterStrength;
+			float theta = time * opacityJitterSpeed;
+			float opacityJitter = (sin(theta) / 2.0 + 1.0) * opacityJitterStrength;
 			gl_FragColor = vec4(fragColor, opacity - opacityJitter);
 		}
 	`,
@@ -168,6 +170,7 @@ const guiParams = {
 const noiseParams = {
 	"Film grain": uniforms.filmGrainIntensity.value,
 	Jitter: uniforms.opacityJitterStrength.value,
+	"Jitter speed": uniforms.opacityJitterSpeed.value,
 };
 const noiseFolder = gui.addFolder("Noise");
 noiseFolder.add(noiseParams, "Film grain", 0, 1).onChange((value) => {
@@ -175,6 +178,9 @@ noiseFolder.add(noiseParams, "Film grain", 0, 1).onChange((value) => {
 });
 noiseFolder.add(noiseParams, "Jitter", 0, 1).onChange((value) => {
 	material.uniforms.opacityJitterStrength.value = value;
+});
+noiseFolder.add(noiseParams, "Jitter speed", 0, 100).onChange((value) => {
+	material.uniforms.opacityJitterSpeed.value = value;
 });
 noiseFolder.open();
 
