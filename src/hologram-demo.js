@@ -48,9 +48,12 @@ const uniforms = {
 	resolution: { value: new Vector2(window.innerWidth * devicePixelRatio, window.innerHeight * devicePixelRatio) },
 	opacity: { value: 0.8 },
 	opacityJitterStrength: { value: 0.1 },
-	opacityJitterSpeed: { value: 30 },
+	opacityJitterSpeed: { value: 40 },
 	smoothStepLighting: { value: true },
 	exposure: { value: 2.0 },
+	wiggleStrength: { value: 2.0 },
+	wigglePeriod: { value: 3.0 },
+	wiggleDuration: { value: 0.05 },
 };
 const material = new ShaderMaterial({
 	transparent: true,
@@ -59,17 +62,20 @@ const material = new ShaderMaterial({
 		varying vec3 vNormal;
 		uniform mat4 inverseViewMatrix;
 		uniform float time;
+		uniform float wiggleStrength;
+		uniform float wigglePeriod;
+		uniform float wiggleDuration;
 
 		void main()
 		{
 			vNormal = normal;
 			float viewSpaceY = (modelViewMatrix * vec4(position, 1.0)).y;
-			float constructiveInterference = 0.0;
-			if (fract(time / 3.0) > 0.95) {
-				constructiveInterference = 2.0;
+			float wiggleFactor = 0.0;
+			if (fract(time / wigglePeriod) > 1.0 - wiggleDuration) {
+				wiggleFactor = wiggleStrength;
 			}
 			float x = viewSpaceY * 25.0 + time * 80.0;
-			vec4 noiseShift = inverseViewMatrix * vec4(constructiveInterference * sin(x / 3.0) * sin(x / 13.0), 0.0, 0.0, 0.0);
+			vec4 noiseShift = inverseViewMatrix * vec4(wiggleFactor * sin(x / 3.0) * sin(x / 13.0), 0.0, 0.0, 0.0);
 			vec3 shiftedPosition = noiseShift.xyz / 7.0 + position;
 			vec4 mvPosition = modelViewMatrix * vec4(shiftedPosition, 1.0);
 			gl_Position = projectionMatrix * mvPosition;
@@ -171,6 +177,9 @@ const noiseParams = {
 	"Film grain": uniforms.filmGrainIntensity.value,
 	Jitter: uniforms.opacityJitterStrength.value,
 	"Jitter speed": uniforms.opacityJitterSpeed.value,
+	"Wiggle strength": uniforms.wiggleStrength.value,
+	"Wiggle period": uniforms.wigglePeriod.value,
+	"Wiggle duration": uniforms.wiggleDuration.value,
 };
 const noiseFolder = gui.addFolder("Noise");
 noiseFolder.add(noiseParams, "Film grain", 0, 1).onChange((value) => {
@@ -181,6 +190,15 @@ noiseFolder.add(noiseParams, "Jitter", 0, 1).onChange((value) => {
 });
 noiseFolder.add(noiseParams, "Jitter speed", 0, 100).onChange((value) => {
 	material.uniforms.opacityJitterSpeed.value = value;
+});
+noiseFolder.add(noiseParams, "Wiggle strength", 0, 10).onChange((value) => {
+	uniforms.wiggleStrength.value = value;
+});
+noiseFolder.add(noiseParams, "Wiggle period", 0, 10).onChange((value) => {
+	uniforms.wigglePeriod.value = value;
+});
+noiseFolder.add(noiseParams, "Wiggle duration", 0, 1).onChange((value) => {
+	uniforms.wiggleDuration.value = value;
 });
 noiseFolder.open();
 
