@@ -47,7 +47,7 @@ const uniforms = {
 	filmGrainIntensity: { value: 0.15 },
 	resolution: { value: new Vector2(window.innerWidth * devicePixelRatio, window.innerHeight * devicePixelRatio) },
 	opacity: { value: 0.8 },
-	opacityJitterStrength: { value: 0.1 },
+	opacityJitterStrength: { value: 0.05 },
 	opacityJitterSpeed: { value: 40 },
 	smoothStepLighting: { value: true },
 	exposure: { value: 2.0 },
