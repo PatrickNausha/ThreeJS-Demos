@@ -141,16 +141,14 @@ composer.setSize(window.innerWidth, window.innerHeight);
 const renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
 
-const bloomPass = new UnrealBloomPass(new Vector2(4, 4), 0.5, 1, 0.2);
+const bloomPass = new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 0.5, 1, 0.2);
 composer.addPass(bloomPass);
 
-console.log(renderer.capabilities);
-
-// const fxaaPass = new ShaderPass(FXAAShader);
-// const pixelRatio = renderer.getPixelRatio();
-// fxaaPass.material.uniforms["resolution"].value.x = 1 / (window.innerWidth * pixelRatio);
-// fxaaPass.material.uniforms["resolution"].value.y = 1 / (window.innerHeight * pixelRatio);
-// composer.addPass(fxaaPass);
+const fxaaPass = new ShaderPass(FXAAShader);
+const pixelRatio = renderer.getPixelRatio();
+fxaaPass.material.uniforms["resolution"].value.x = 1 / (window.innerWidth * pixelRatio);
+fxaaPass.material.uniforms["resolution"].value.y = 1 / (window.innerHeight * pixelRatio);
+composer.addPass(fxaaPass);
 
 // GUI
 const gui = new GUI();
@@ -162,7 +160,7 @@ const guiParams = {
 	scanLineScale: uniforms.scanLineScale.value,
 	scanLineIntensity: uniforms.scanLineIntensity.value,
 	bloom: bloomPass.enabled,
-	//"anti-aliasing": fxaaPass.enabled,
+	"anti-aliasing": fxaaPass.enabled,
 	opacity: uniforms.opacity.value,
 	smoothStepLighting: uniforms.smoothStepLighting.value,
 };
@@ -184,13 +182,13 @@ gui.add(guiParams, "opacity", 0, 1).onChange((value) => {
 gui.add(guiParams, "bloom").onChange((value) => {
 	bloomPass.enabled = value;
 });
-// gui.add(guiParams, "anti-aliasing").onChange((value) => {
-// 	fxaaPass.enabled = value;
-// });
+gui.add(guiParams, "anti-aliasing").onChange((value) => {
+	fxaaPass.enabled = value;
+});
 gui.add(guiParams, "smoothStepLighting").onChange((value) => {
 	material.uniforms.smoothStepLighting.value = value;
 });
-gui.add(guiParams, "scanLineScale", 0, 1).onChange((value) => {
+gui.add(guiParams, "scanLineScale", 0, 2).onChange((value) => {
 	material.uniforms.scanLineScale.value = value;
 });
 gui.add(guiParams, "scanLineIntensity", 0, 1).onChange((value) => {
