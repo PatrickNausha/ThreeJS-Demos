@@ -42,7 +42,6 @@ const uniforms = {
 	time: { value: 1.0 },
 	scanLineScale: { value: 1.0 / devicePixelRatio },
 	scanLineIntensity: { value: 0.75 },
-	scanLineSpeed: { value: 0 },
 	color: { value: new Vector3(0.07, 0.07, 0.15) },
 	lightingIntensity: { value: 3.5 },
 	filmGrainIntensity: { value: 0.15 },
@@ -77,7 +76,6 @@ const material = new ShaderMaterial({
 		#define PI 3.141592653589793
 		uniform float scanLineScale;
 		uniform float scanLineIntensity;
-		uniform float scanLineSpeed;
 		uniform float filmGrainIntensity;
 		uniform float time;
 		uniform float exposure;
@@ -108,7 +106,7 @@ const material = new ShaderMaterial({
 			float verticalNoiseStrength = mix(0.1875, 0.25, sin(3.1416 * fract(time * verticalNoiseFrameRate)));
 			float verticalNoise = pow(100.0, sin(adderX) * sin(adderX / 3.0) * sin(adderX / 13.0)) / 100.0 * verticalNoiseStrength;
 
-			float scanLineMultiplier = mix(1.0 - scanLineIntensity, 1.0, abs(sin(gl_FragCoord.y * scanLineScale * PI * 0.25 - time * scanLineSpeed)));
+			float scanLineMultiplier = mix(1.0 - scanLineIntensity, 1.0, abs(sin(gl_FragCoord.y * scanLineScale * PI * 0.25)));
 
 			float brightness = diffuse + verticalNoise;
 			
@@ -156,7 +154,6 @@ const gui = new GUI();
 const guiParams = {
 	lightingIntensity: uniforms.lightingIntensity.value,
 	exposure: uniforms.exposure.value,
-	scanLineSpeed: uniforms.scanLineSpeed.value,
 	filmGrainIntensity: uniforms.filmGrainIntensity.value,
 	scanLineScale: uniforms.scanLineScale.value,
 	scanLineIntensity: uniforms.scanLineIntensity.value,
@@ -170,9 +167,6 @@ gui.add(guiParams, "lightingIntensity", 0, 10).onChange((value) => {
 });
 gui.add(guiParams, "exposure", 0, 10).onChange((value) => {
 	material.uniforms.exposure.value = value;
-});
-gui.add(guiParams, "scanLineSpeed", 0, 30).onChange((value) => {
-	material.uniforms.scanLineSpeed.value = value;
 });
 gui.add(guiParams, "filmGrainIntensity", 0, 1).onChange((value) => {
 	material.uniforms.filmGrainIntensity.value = value;
