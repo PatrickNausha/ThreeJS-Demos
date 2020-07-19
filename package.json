@@ -13,7 +13,7 @@
 		"gh-pages": "^3.0.0"
 	},
 	"dependencies": {
-		"three": "^0.117.1",
+		"three": "^0.118.3",
 		"stats-js": "^1.0.1"
 	}
 }
