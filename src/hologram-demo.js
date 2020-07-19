@@ -160,12 +160,12 @@ const guiParams = {
 	bloom: bloomPass.enabled,
 	"Anti-aliasing": fxaaPass.enabled,
 	Opacity: uniforms.opacity.value,
-	smoothStepLighting: uniforms.smoothStepLighting.value,
 };
 
 const lightingParams = {
 	Intensity: uniforms.lightingIntensity.value,
 	Exposure: uniforms.exposure.value,
+	"Smooth step": uniforms.smoothStepLighting.value,
 };
 const lightingFolder = gui.addFolder("Lighting");
 lightingFolder.add(lightingParams, "Intensity", 0, 10).onChange((value) => {
@@ -173,6 +173,9 @@ lightingFolder.add(lightingParams, "Intensity", 0, 10).onChange((value) => {
 });
 lightingFolder.add(lightingParams, "Exposure", 0, 10).onChange((value) => {
 	material.uniforms.exposure.value = value;
+});
+lightingFolder.add(lightingParams, "Smooth step").onChange((value) => {
+	material.uniforms.smoothStepLighting.value = value;
 });
 lightingFolder.open();
 gui.add(guiParams, "Film grain", 0, 1).onChange((value) => {
@@ -186,9 +189,6 @@ gui.add(guiParams, "bloom").onChange((value) => {
 });
 gui.add(guiParams, "Anti-aliasing").onChange((value) => {
 	fxaaPass.enabled = value;
-});
-gui.add(guiParams, "smoothStepLighting").onChange((value) => {
-	material.uniforms.smoothStepLighting.value = value;
 });
 
 const scanlineParams = {
