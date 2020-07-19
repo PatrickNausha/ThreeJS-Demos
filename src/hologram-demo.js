@@ -47,6 +47,7 @@ const uniforms = {
 	filmGrainIntensity: { value: 0.15 },
 	resolution: { value: new Vector2(window.innerWidth * devicePixelRatio, window.innerHeight * devicePixelRatio) },
 	opacity: { value: 0.8 },
+	opacityJitterStrength: { value: 0.05 },
 	smoothStepLighting: { value: true },
 	exposure: { value: 2.0 },
 };
@@ -84,6 +85,7 @@ const material = new ShaderMaterial({
 		uniform vec2 resolution;
 		uniform float lightingIntensity;
 		uniform bool smoothStepLighting;
+		uniform float opacityJitterStrength;
 		varying vec3 vNormal;	// Interpolated Normal vector passed in from vertex shader
 
 		// Psuedo-random generator from https://thebookofshaders.com/10/
@@ -117,8 +119,10 @@ const material = new ShaderMaterial({
 			float filmGrain = (2.0 * random(gl_FragCoord.xy / resolution + fract(time)) - 1.0) * filmGrainIntensity;
 
 			vec3 fragColor = ((mix(color.xyz, vec3(0.1, 0.2, 1.0), brightness) * exposure) + filmGrain) * scanLineMultiplier;
-			
-			gl_FragColor = vec4(fragColor, opacity);
+
+			float theta = time * 30.0;
+			float opacityJitter = sin(theta) * opacityJitterStrength;
+			gl_FragColor = vec4(fragColor, opacity - opacityJitter);
 		}
 	`,
 });
@@ -156,11 +160,23 @@ composer.addPass(fxaaPass);
 // GUI
 const gui = new GUI();
 const guiParams = {
-	"Film grain": uniforms.filmGrainIntensity.value,
 	bloom: bloomPass.enabled,
 	"Anti-aliasing": fxaaPass.enabled,
 	Opacity: uniforms.opacity.value,
 };
+
+const noiseParams = {
+	"Film grain": uniforms.filmGrainIntensity.value,
+	Jitter: uniforms.opacityJitterStrength.value,
+};
+const noiseFolder = gui.addFolder("Noise");
+noiseFolder.add(noiseParams, "Film grain", 0, 1).onChange((value) => {
+	material.uniforms.filmGrainIntensity.value = value;
+});
+noiseFolder.add(noiseParams, "Jitter", 0, 1).onChange((value) => {
+	material.uniforms.opacityJitterStrength.value = value;
+});
+noiseFolder.open();
 
 const lightingParams = {
 	Intensity: uniforms.lightingIntensity.value,
@@ -178,9 +194,7 @@ lightingFolder.add(lightingParams, "Smooth step").onChange((value) => {
 	material.uniforms.smoothStepLighting.value = value;
 });
 lightingFolder.open();
-gui.add(guiParams, "Film grain", 0, 1).onChange((value) => {
-	material.uniforms.filmGrainIntensity.value = value;
-});
+
 gui.add(guiParams, "Opacity", 0, 1).onChange((value) => {
 	material.uniforms.opacity.value = value;
 });
