@@ -101,14 +101,14 @@ const material = new ShaderMaterial({
 				diffuse = smoothstep(0.0, 1.0, diffuse);
 			diffuse *= lightingIntensity;
 
-			// Use a "spikey" sign equation shifted by time for some moving glowing noise bars.
+			// Use a "spikey" sine equation shifted by time for some moving glowing noise bars.
 			float verticalNoiseFrameRate = 16.0;
 			float verticalNoiseSpeed = 32.0;
 			float adderX = (gl_FragCoord.y + floor(time * verticalNoiseFrameRate) * verticalNoiseSpeed) / 20.0;
 			float verticalNoiseStrength = mix(0.1875, 0.25, sin(3.1416 * fract(time * verticalNoiseFrameRate)));
 			float verticalNoise = pow(100.0, sin(adderX) * sin(adderX / 3.0) * sin(adderX / 13.0)) / 100.0 * verticalNoiseStrength;
 
-			float scanLineMultiplier = mix(1.0 - scanLineIntensity, 1.0, min(abs(sin(gl_FragCoord.y * scanLineScale * PI * 0.25 - time * scanLineSpeed)), 1.0));
+			float scanLineMultiplier = mix(1.0 - scanLineIntensity, 1.0, abs(sin(gl_FragCoord.y * scanLineScale * PI * 0.25 - time * scanLineSpeed)));
 
 			float brightness = diffuse + verticalNoise;
 			
