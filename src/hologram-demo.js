@@ -156,21 +156,22 @@ composer.addPass(fxaaPass);
 // GUI
 const gui = new GUI();
 const guiParams = {
-	Intensity: uniforms.lightingIntensity.value,
-	Exposure: uniforms.exposure.value,
 	"Film grain": uniforms.filmGrainIntensity.value,
-	scanLineScale: uniforms.scanLineScale.value,
-	scanLineIntensity: uniforms.scanLineIntensity.value,
 	bloom: bloomPass.enabled,
 	"Anti-aliasing": fxaaPass.enabled,
 	Opacity: uniforms.opacity.value,
 	smoothStepLighting: uniforms.smoothStepLighting.value,
 };
+
+const lightingParams = {
+	Intensity: uniforms.lightingIntensity.value,
+	Exposure: uniforms.exposure.value,
+};
 const lightingFolder = gui.addFolder("Lighting");
-lightingFolder.add(guiParams, "Intensity", 0, 10).onChange((value) => {
+lightingFolder.add(lightingParams, "Intensity", 0, 10).onChange((value) => {
 	material.uniforms.lightingIntensity.value = value;
 });
-lightingFolder.add(guiParams, "Exposure", 0, 10).onChange((value) => {
+lightingFolder.add(lightingParams, "Exposure", 0, 10).onChange((value) => {
 	material.uniforms.exposure.value = value;
 });
 lightingFolder.open();
@@ -189,10 +190,16 @@ gui.add(guiParams, "Anti-aliasing").onChange((value) => {
 gui.add(guiParams, "smoothStepLighting").onChange((value) => {
 	material.uniforms.smoothStepLighting.value = value;
 });
-gui.add(guiParams, "scanLineScale", 0, 2).onChange((value) => {
+
+const scanlineParams = {
+	Scale: uniforms.scanLineScale.value,
+	Intensity: uniforms.scanLineIntensity.value,
+};
+const scanlineFolder = gui.addFolder("Scanlines");
+scanlineFolder.add(scanlineParams, "Scale", 0, 2).onChange((value) => {
 	material.uniforms.scanLineScale.value = value;
 });
-gui.add(guiParams, "scanLineIntensity", 0, 1).onChange((value) => {
+scanlineFolder.add(scanlineParams, "Intensity", 0, 1).onChange((value) => {
 	material.uniforms.scanLineIntensity.value = value;
 });
 
