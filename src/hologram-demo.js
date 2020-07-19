@@ -53,7 +53,7 @@ const uniforms = {
 	exposure: { value: 2.0 },
 	wiggleStrength: { value: 2.0 },
 	wigglePeriod: { value: 3.0 },
-	wiggleDuration: { value: 0.05 },
+	wiggleDuration: { value: 0.1 },
 };
 const material = new ShaderMaterial({
 	transparent: true,
