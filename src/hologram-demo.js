@@ -74,7 +74,10 @@ const material = new ShaderMaterial({
 			if (fract(time / wigglePeriod) > 1.0 - wiggleDuration) {
 				wiggleFactor = wiggleStrength;
 			}
-			float x = viewSpaceY * 25.0 + time * 80.0;
+
+			float jitterScale = 25.0;
+			float jitterSpeed = 80.0;
+			float x = viewSpaceY * jitterScale + time * jitterSpeed;
 			vec4 noiseShift = inverseViewMatrix * vec4(wiggleFactor * sin(x / 3.0) * sin(x / 13.0), 0.0, 0.0, 0.0);
 			vec3 shiftedPosition = noiseShift.xyz / 7.0 + position;
 			vec4 mvPosition = modelViewMatrix * vec4(shiftedPosition, 1.0);
