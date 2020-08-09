@@ -61,6 +61,7 @@ const guiParams = {
 	Transparent: false,
 	"Depth test": true,
 	Distance: defaultDistance,
+	"Sort objects": renderer.sortObjects,
 };
 
 gui.add(guiParams, "Opacity", 0, 1).onChange((value) => {
@@ -72,8 +73,11 @@ gui.add(guiParams, "Transparent").onChange((value) => {
 gui.add(guiParams, "Depth test").onChange((value) => {
 	material.depthTest = value;
 });
-gui.add(guiParams, "Distance", 0, 10).onChange((distance) => {
+gui.add(guiParams, "Distance", -10, 10).onChange((distance) => {
 	layOutMeshes(distance);
+});
+gui.add(guiParams, "Sort objects").onChange((value) => {
+	renderer.sortObjects = value;
 });
 
 // Main loop
