@@ -14,7 +14,6 @@ import {
 	Group,
 	ArrowHelper,
 } from "three";
-import { GUI } from "dat.gui";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { updateStats, toggleStats } from "./debug-stats";
 
@@ -32,8 +31,8 @@ const scene = new Scene();
 // Camera
 const camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.x = 0;
-camera.position.y = 2;
-camera.position.z = 10;
+camera.position.y = 4;
+camera.position.z = 20;
 new OrbitControls(camera, renderer.domElement);
 
 const planeMaterial = new MeshBasicMaterial({
@@ -47,18 +46,14 @@ const planeNormalHelper = new ArrowHelper(planeNormal, new Vector3(0, 0, 0), 2, 
 const planeMatrix = new Matrix4();
 planeGroup.matrixAutoUpdate = false;
 planeGroup.matrix = planeMatrix;
-planeMatrix.setPosition(0, 0, -1);
 planeGroup.add(planeMesh);
 planeGroup.add(planeNormalHelper);
 scene.add(planeGroup);
 
 const material = new MeshStandardMaterial();
 const mesh = new Mesh(new TorusKnotGeometry(1, 0.34, 128, 16), material);
-const meshMatrix = new Matrix4();
-meshMatrix.setPosition(0, 0, 2);
 scene.add(mesh);
 mesh.matrixAutoUpdate = false;
-mesh.matrix = meshMatrix;
 
 const reflection = new Mesh(new TorusKnotGeometry(1, 0.34, 128, 16), material);
 reflection.matrixAutoUpdate = false;
@@ -70,22 +65,24 @@ scene.add(light);
 // Show stats
 toggleStats();
 
-GUI;
-const gui = new GUI();
-const guiParams = {
-	Opacity: 1,
-};
-
-gui.add(guiParams, "Opacity", 0, 1).onChange((value) => {
-	material.opacity = value;
-});
-
 // Main loop
-function animate() {
+function animate(timestamp) {
 	requestAnimationFrame(animate);
-	const meshMatrixCopy = meshMatrix.clone();
-	const reflectionMatrix = meshMatrix;
+
+	const timestampSeconds = timestamp / 1000;
+	mesh.matrix.makeRotationY(timestampSeconds);
+	mesh.matrix.setPosition(Math.sin(timestampSeconds), 0, 5);
+
+	const meshMatrixCopy = mesh.matrix.clone();
+	const reflectionMatrix = new Matrix4()
+		.multiply(planeGroup.matrix) // Convert from plane-local space to mirrored world space.
+		.multiply(new Matrix4().makeScale(1, 1, -1)) // Mirror it.
+		.multiply(new Matrix4().getInverse(planeGroup.matrix)) // Convert world space to plane-local space.
+		.multiply(meshMatrixCopy); // Convert mesh-local space to world space.
 	reflection.matrix = reflectionMatrix;
+
+	planeGroup.matrix.makeRotationY((Math.PI / 4) * Math.sin(timestampSeconds / 3.21));
+	planeGroup.matrix.setPosition(0, 0, Math.sin(timestampSeconds));
 	renderer.render(scene, camera);
 	updateStats();
 }
