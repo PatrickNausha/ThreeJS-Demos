@@ -35,12 +35,12 @@ camera.position.y = 4;
 camera.position.z = 20;
 new OrbitControls(camera, renderer.domElement);
 
-const planeMaterial = new MeshBasicMaterial({
+const reflectionPlaneMaterial = new MeshBasicMaterial({
 	color: 0xff0000,
 	wireframe: true,
 });
 const planeGroup = new Group();
-const planeMesh = new Mesh(new PlaneGeometry(10, 10, 1, 1), planeMaterial);
+const planeMesh = new Mesh(new PlaneGeometry(10, 10, 1, 1), reflectionPlaneMaterial);
 const planeNormal = new Vector3(0, 0, 1);
 const planeNormalHelper = new ArrowHelper(planeNormal, new Vector3(0, 0, 0), 2, 0x00ff00);
 const planeMatrix = new Matrix4();
@@ -49,6 +49,15 @@ planeGroup.matrix = planeMatrix;
 planeGroup.add(planeMesh);
 planeGroup.add(planeNormalHelper);
 scene.add(planeGroup);
+
+const groundMaterial = new MeshBasicMaterial({
+	color: 0x0000ff,
+	wireframe: true,
+});
+const groundMesh = new Mesh(new PlaneGeometry(100, 100, 20, 20), groundMaterial);
+groundMesh.rotateX(Math.PI / 2);
+groundMesh.position.y = -5;
+scene.add(groundMesh);
 
 const material = new MeshStandardMaterial();
 const mesh = new Mesh(new TorusKnotGeometry(1, 0.34, 128, 16), material);
