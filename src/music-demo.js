@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import * as Tone from "tone";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { RectAreaLightHelper } from "three/examples/jsm/helpers/RectAreaLightHelper";
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib";
@@ -37,6 +38,13 @@ function init() {
 	rectLightHelper2 = new RectAreaLightHelper(rectLight2);
 	rectLightHelper3 = new RectAreaLightHelper(rectLight3);
 
+	rectLight1.visible = false;
+	rectLightHelper1.visible = false;
+	rectLight2.visible = false;
+	rectLightHelper2.visible = false;
+	rectLight3.visible = false;
+	rectLightHelper3.visible = false;
+
 	scene.add(rectLightHelper1);
 	scene.add(rectLightHelper2);
 	scene.add(rectLightHelper3);
@@ -60,6 +68,20 @@ function init() {
 	window.addEventListener("resize", onWindowResize);
 }
 
+// const dist = new Tone.PingPongDelay("8n", 0.8).toDestination();
+const synth = new Tone.PolySynth(Tone.Synth);
+// synth.connect(dist);
+synth.toDestination();
+
+//create a synth and connect it to the main output (your speakers)
+let resolveTonePromise;
+const tonePromise = new Promise((resolve) => {
+	resolveTonePromise = resolve;
+});
+document.body.addEventListener("click", () => {
+	Tone.start().then(resolveTonePromise);
+});
+
 function onWindowResize() {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	camera.aspect = window.innerWidth / window.innerHeight;
@@ -73,17 +95,37 @@ function animation(time) {
 	renderer.render(scene, camera);
 }
 
-setInterval(() => {
-	rectLight1.visible = !rectLight1.visible;
-	rectLightHelper1.visible = !rectLightHelper1.visible;
-}, 1000);
+tonePromise.then(() => {
+	setInterval(() => {
+		rectLight1.visible = !rectLight1.visible;
+		rectLightHelper1.visible = !rectLightHelper1.visible;
 
-setInterval(() => {
-	rectLight2.visible = !rectLight2.visible;
-	rectLightHelper2.visible = !rectLightHelper2.visible;
-}, 768);
+		if (rectLight1.visible) {
+			synth.triggerAttack("C3");
+		} else {
+			synth.triggerRelease("C3");
+		}
+	}, 1000);
 
-setInterval(() => {
-	rectLight3.visible = !rectLight3.visible;
-	rectLightHelper3.visible = !rectLightHelper3.visible;
-}, 1234);
+	setInterval(() => {
+		rectLight2.visible = !rectLight2.visible;
+		rectLightHelper2.visible = !rectLightHelper2.visible;
+
+		if (rectLight2.visible) {
+			synth.triggerAttack("E3");
+		} else {
+			synth.triggerRelease("E3");
+		}
+	}, 500);
+
+	setInterval(() => {
+		rectLight3.visible = !rectLight3.visible;
+		rectLightHelper3.visible = !rectLightHelper3.visible;
+
+		if (rectLight3.visible) {
+			synth.triggerAttack("G3");
+		} else {
+			synth.triggerRelease("G3");
+		}
+	}, 1250);
+});
