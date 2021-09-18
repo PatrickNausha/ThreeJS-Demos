@@ -3,7 +3,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { RectAreaLightHelper } from "three/examples/jsm/helpers/RectAreaLightHelper";
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib";
 
-let renderer, scene, camera;
+let renderer, scene, camera, rectLight1, rectLight2, rectLight3, rectLightHelper1, rectLightHelper2, rectLightHelper3;
 
 init();
 
@@ -21,21 +21,25 @@ function init() {
 	scene = new THREE.Scene();
 
 	RectAreaLightUniformsLib.init();
-	const rectLight1 = new THREE.RectAreaLight(0x8ce2dd, 5, 4, 100);
+	rectLight1 = new THREE.RectAreaLight(0x8ce2dd, 5, 4, 100);
 	rectLight1.position.set(-5, 50, 5);
 	scene.add(rectLight1);
 
-	const rectLight2 = new THREE.RectAreaLight(0x21e7bd, 5, 4, 100);
+	rectLight2 = new THREE.RectAreaLight(0x21e7bd, 5, 4, 100);
 	rectLight2.position.set(0, 50, 5);
 	scene.add(rectLight2);
 
-	const rectLight3 = new THREE.RectAreaLight(0xefa20e, 5, 4, 100);
+	rectLight3 = new THREE.RectAreaLight(0xefa20e, 5, 4, 100);
 	rectLight3.position.set(5, 50, 5);
 	scene.add(rectLight3);
 
-	scene.add(new RectAreaLightHelper(rectLight1));
-	scene.add(new RectAreaLightHelper(rectLight2));
-	scene.add(new RectAreaLightHelper(rectLight3));
+	rectLightHelper1 = new RectAreaLightHelper(rectLight1);
+	rectLightHelper2 = new RectAreaLightHelper(rectLight2);
+	rectLightHelper3 = new RectAreaLightHelper(rectLight3);
+
+	scene.add(rectLightHelper1);
+	scene.add(rectLightHelper2);
+	scene.add(rectLightHelper3);
 
 	const geoFloor = new THREE.BoxGeometry(2000, 0.1, 2000);
 	const matStdFloor = new THREE.MeshStandardMaterial({ color: 0x808080, roughness: 0.1, metalness: 0 });
@@ -68,3 +72,18 @@ function animation(time) {
 
 	renderer.render(scene, camera);
 }
+
+setInterval(() => {
+	rectLight1.visible = !rectLight1.visible;
+	rectLightHelper1.visible = !rectLightHelper1.visible;
+}, 1000);
+
+setInterval(() => {
+	rectLight2.visible = !rectLight2.visible;
+	rectLightHelper2.visible = !rectLightHelper2.visible;
+}, 768);
+
+setInterval(() => {
+	rectLight3.visible = !rectLight3.visible;
+	rectLightHelper3.visible = !rectLightHelper3.visible;
+}, 1234);
