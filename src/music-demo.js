@@ -16,22 +16,30 @@ function init() {
 	renderer.outputEncoding = THREE.sRGBEncoding;
 	document.body.appendChild(renderer.domElement);
 
+	const textureLoader = new THREE.TextureLoader();
+	const concreteDiffuseMap = textureLoader.load("./assets/concrete/Concrete019_1K_Color.jpg");
+	const concreteNormalMap = textureLoader.load("./assets/concrete/Concrete019_1K_NormalGL.jpg");
+	concreteDiffuseMap.wrapS = concreteDiffuseMap.wrapT = THREE.RepeatWrapping;
+	concreteNormalMap.wrapS = concreteNormalMap.wrapT = THREE.RepeatWrapping;
+	concreteDiffuseMap.repeat.set(10, 10);
+	concreteNormalMap.repeat.set(10, 10);
+
 	camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
 	camera.position.set(0, 5, -15);
 
 	scene = new THREE.Scene();
 
 	RectAreaLightUniformsLib.init();
-	rectLight1 = new THREE.RectAreaLight(0x8ce2dd, 5, 4, 100);
-	rectLight1.position.set(-5, 50, 5);
+	rectLight1 = new THREE.RectAreaLight(0x8ce2dd, 5, 4, 24);
+	rectLight1.position.set(-5, 12, 5);
 	scene.add(rectLight1);
 
-	rectLight2 = new THREE.RectAreaLight(0x21e7bd, 5, 4, 100);
-	rectLight2.position.set(0, 50, 5);
+	rectLight2 = new THREE.RectAreaLight(0x21e7bd, 5, 4, 24);
+	rectLight2.position.set(0, 12, 5);
 	scene.add(rectLight2);
 
-	rectLight3 = new THREE.RectAreaLight(0xefa20e, 5, 4, 100);
-	rectLight3.position.set(5, 50, 5);
+	rectLight3 = new THREE.RectAreaLight(0xefa20e, 5, 4, 24);
+	rectLight3.position.set(5, 12, 5);
 	scene.add(rectLight3);
 
 	rectLightHelper1 = new RectAreaLightHelper(rectLight1);
@@ -49,9 +57,16 @@ function init() {
 	scene.add(rectLightHelper2);
 	scene.add(rectLightHelper3);
 
-	const geoFloor = new THREE.BoxGeometry(2000, 0.1, 2000);
-	const matStdFloor = new THREE.MeshStandardMaterial({ color: 0x808080, roughness: 0.1, metalness: 0 });
+	const geoFloor = new THREE.PlaneGeometry(100, 100);
+	const matStdFloor = new THREE.MeshStandardMaterial({
+		color: 0x707070,
+		roughness: 0.2,
+		metalness: 0,
+		normalMap: concreteNormalMap,
+		map: concreteDiffuseMap,
+	});
 	const mshStdFloor = new THREE.Mesh(geoFloor, matStdFloor);
+	mshStdFloor.rotation.x = -Math.PI / 2;
 	scene.add(mshStdFloor);
 
 	const geoKnot = new THREE.TorusKnotGeometry(1.5, 0.5, 200, 16);
