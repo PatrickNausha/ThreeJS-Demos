@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import * as Tone from "tone";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { Reflector } from "three/examples/jsm/objects/Reflector";
+import { Reflector } from "./reflector";
 import { RectAreaLightHelper } from "three/examples/jsm/helpers/RectAreaLightHelper";
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib";
 
