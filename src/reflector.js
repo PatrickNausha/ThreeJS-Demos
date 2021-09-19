@@ -205,9 +205,11 @@ Reflector.ReflectorShader = {
 	vertexShader: /* glsl */ `
 		uniform mat4 textureMatrix;
 		varying vec4 vUv;
+		varying vec2 originalUv;
 		#include <common>
 		#include <logdepthbuf_pars_vertex>
 		void main() {
+			originalUv = uv;
 			vUv = textureMatrix * vec4( position, 1.0 );
 			vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 			gl_Position = projectionMatrix * mvPosition;
@@ -218,6 +220,7 @@ Reflector.ReflectorShader = {
 		uniform vec3 color;
 		uniform sampler2D tDiffuse;
 		varying vec4 vUv;
+		varying vec2 originalUv;
 		#include <logdepthbuf_pars_fragment>
 		float blendOverlay( float base, float blend ) {
 			return( base < 0.5 ? ( 2.0 * base * blend ) : ( 1.0 - 2.0 * ( 1.0 - base ) * ( 1.0 - blend ) ) );
@@ -227,7 +230,10 @@ Reflector.ReflectorShader = {
 		}
 		void main() {
 			#include <logdepthbuf_fragment>
-			vec4 base = texture2DProj( tDiffuse, vUv );
+			vec2 vUv2d = (vUv.xy / vUv.q);
+			vUv2d.x += sin(originalUv.x * 100.0) / 1000.0 + cos(originalUv.y * 100.0) / 1000.0;
+			vUv2d.y += cos(originalUv.x * 100.0) / 1000.0 + sin(originalUv.y * 100.0) / 1000.0;
+			vec4 base = texture2D(tDiffuse, vUv2d);
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
 		}`,
 };
