@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import * as Tone from "tone";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { Reflector } from "three/examples/jsm/objects/Reflector";
 import { RectAreaLightHelper } from "three/examples/jsm/helpers/RectAreaLightHelper";
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib";
 
@@ -58,14 +59,26 @@ function init() {
 	scene.add(rectLightHelper3);
 
 	const geoFloor = new THREE.PlaneGeometry(100, 100);
+	const groundMirror = new Reflector(geoFloor, {
+		clipBias: 0.003,
+		textureWidth: window.innerWidth * window.devicePixelRatio,
+		textureHeight: window.innerHeight * window.devicePixelRatio,
+		color: 0x777777,
+	});
+	groundMirror.rotateX(-Math.PI / 2);
+	scene.add(groundMirror);
+
 	const matStdFloor = new THREE.MeshStandardMaterial({
 		color: 0x707070,
 		roughness: 0.2,
 		metalness: 0,
 		normalMap: concreteNormalMap,
 		map: concreteDiffuseMap,
+		transparent: true,
+		opacity: 0.7,
 	});
 	const mshStdFloor = new THREE.Mesh(geoFloor, matStdFloor);
+	mshStdFloor.position.y = 0.5;
 	mshStdFloor.rotation.x = -Math.PI / 2;
 	scene.add(mshStdFloor);
 
