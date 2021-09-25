@@ -75,10 +75,10 @@ function init() {
 		normalMap: concreteNormalMap,
 		map: concreteDiffuseMap,
 		transparent: true,
-		opacity: 0.7,
+		opacity: 0.9,
+		depthFunc: THREE.EqualDepth, // Match reflector depth exactly
 	});
 	const mshStdFloor = new THREE.Mesh(geoFloor, matStdFloor);
-	mshStdFloor.position.y = 0.5;
 	mshStdFloor.rotation.x = -Math.PI / 2;
 	scene.add(mshStdFloor);
 
