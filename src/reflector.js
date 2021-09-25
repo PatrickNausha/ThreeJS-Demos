@@ -66,6 +66,8 @@ class Reflector extends Mesh {
 		material.uniforms["tDiffuse"].value = renderTarget.texture;
 		material.uniforms["color"].value = color;
 		material.uniforms["textureMatrix"].value = textureMatrix;
+		material.uniforms["textureWidth"].value = textureWidth;
+		material.uniforms["textureHeight"].value = textureHeight;
 
 		this.material = material;
 
@@ -200,6 +202,22 @@ Reflector.ReflectorShader = {
 		textureMatrix: {
 			value: null,
 		},
+
+		textureWidth: {
+			value: null,
+		},
+
+		textureHeight: {
+			value: null,
+		},
+
+		gaussianOffsets: {
+			value: [0.0, 1.3846153846, 3.2307692308],
+		},
+
+		gaussianWeights: {
+			value: [0.227027027, 0.3162162162, 0.0702702703],
+		},
 	},
 
 	vertexShader: /* glsl */ `
@@ -219,9 +237,28 @@ Reflector.ReflectorShader = {
 	fragmentShader: /* glsl */ `
 		uniform vec3 color;
 		uniform sampler2D tDiffuse;
+		uniform float textureWidth;
+		uniform float textureHeight;
 		varying vec4 vUv;
 		varying vec2 originalUv;
 		#include <logdepthbuf_pars_fragment>
+		
+		uniform float gaussianOffsets[3];
+		uniform float gaussianWeights[3];
+
+		vec4 gaussianBlur(vec2 center) {
+			vec4 fragColor = texture2D(tDiffuse, center) * gaussianWeights[0];
+			for (int i=1; i<3; i++) {
+				fragColor +=
+					texture2D(tDiffuse, (center + vec2(0.0, gaussianOffsets[i] / textureHeight)))
+						* gaussianWeights[i];
+				fragColor +=
+					texture2D(tDiffuse, (center - vec2(0.0, gaussianOffsets[i] / textureHeight)))
+						* gaussianWeights[i];
+			}
+			return fragColor;
+		}
+
 		float blendOverlay( float base, float blend ) {
 			return( base < 0.5 ? ( 2.0 * base * blend ) : ( 1.0 - 2.0 * ( 1.0 - base ) * ( 1.0 - blend ) ) );
 		}
@@ -231,9 +268,8 @@ Reflector.ReflectorShader = {
 		void main() {
 			#include <logdepthbuf_fragment>
 			vec2 vUv2d = (vUv.xy / vUv.q);
-			vUv2d.x += sin(originalUv.x * 100.0) / 1000.0 + cos(originalUv.y * 100.0) / 1000.0;
-			vUv2d.y += cos(originalUv.x * 100.0) / 1000.0 + sin(originalUv.y * 100.0) / 1000.0;
-			vec4 base = texture2D(tDiffuse, vUv2d);
+
+			vec4 base = gaussianBlur(vUv2d);
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
 		}`,
 };

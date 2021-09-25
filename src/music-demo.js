@@ -4,26 +4,21 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Reflector } from "./reflector";
 import { RectAreaLightHelper } from "three/examples/jsm/helpers/RectAreaLightHelper";
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib";
+import { updateStats, toggleStats } from "./debug-stats";
 
 let renderer, scene, camera, rectLight1, rectLight2, rectLight3, rectLightHelper1, rectLightHelper2, rectLightHelper3;
 
 init();
 
 function init() {
+	toggleStats();
+
 	renderer = new THREE.WebGLRenderer({ antialias: true });
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.setAnimationLoop(animation);
 	renderer.outputEncoding = THREE.sRGBEncoding;
 	document.body.appendChild(renderer.domElement);
-
-	const textureLoader = new THREE.TextureLoader();
-	const concreteDiffuseMap = textureLoader.load("./assets/concrete/Concrete019_1K_Color.jpg");
-	const concreteNormalMap = textureLoader.load("./assets/concrete/Concrete019_1K_NormalGL.jpg");
-	concreteDiffuseMap.wrapS = concreteDiffuseMap.wrapT = THREE.RepeatWrapping;
-	concreteNormalMap.wrapS = concreteNormalMap.wrapT = THREE.RepeatWrapping;
-	concreteDiffuseMap.repeat.set(10, 10);
-	concreteNormalMap.repeat.set(10, 10);
 
 	camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
 	camera.position.set(0, 5, -15);
@@ -47,12 +42,12 @@ function init() {
 	rectLightHelper2 = new RectAreaLightHelper(rectLight2);
 	rectLightHelper3 = new RectAreaLightHelper(rectLight3);
 
-	rectLight1.visible = false;
-	rectLightHelper1.visible = false;
-	rectLight2.visible = false;
-	rectLightHelper2.visible = false;
-	rectLight3.visible = false;
-	rectLightHelper3.visible = false;
+	// rectLight1.visible = false;
+	// rectLightHelper1.visible = false;
+	// rectLight2.visible = false;
+	// rectLightHelper2.visible = false;
+	// rectLight3.visible = false;
+	// rectLightHelper3.visible = false;
 
 	scene.add(rectLightHelper1);
 	scene.add(rectLightHelper2);
@@ -72,8 +67,6 @@ function init() {
 		color: 0x707070,
 		roughness: 0.2,
 		metalness: 0,
-		normalMap: concreteNormalMap,
-		map: concreteDiffuseMap,
 		transparent: true,
 		opacity: 0.9,
 		depthFunc: THREE.EqualDepth, // Match reflector depth exactly
@@ -104,7 +97,7 @@ synth.toDestination();
 //create a synth and connect it to the main output (your speakers)
 let resolveTonePromise;
 const tonePromise = new Promise((resolve) => {
-	resolveTonePromise = resolve;
+	// resolveTonePromise = resolve;
 });
 document.body.addEventListener("click", () => {
 	Tone.start().then(resolveTonePromise);
@@ -121,6 +114,7 @@ function animation(time) {
 	mesh.rotation.y = time / 1000;
 
 	renderer.render(scene, camera);
+	updateStats();
 }
 
 tonePromise.then(() => {
