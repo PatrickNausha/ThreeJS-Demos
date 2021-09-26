@@ -13,6 +13,8 @@ import {
 	Vector4,
 	WebGLRenderTarget,
 } from "three";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 
 class Reflector extends Mesh {
 	constructor(geometry, options = {}) {
@@ -52,6 +54,12 @@ class Reflector extends Mesh {
 		};
 
 		const renderTarget = new WebGLRenderTarget(textureWidth, textureHeight, parameters);
+		renderTarget.texture.name = "reflector-render-target";
+		const composer = new EffectComposer(null, renderTarget);
+		composer.swapBuffers();
+		composer.renderToScreen = false;
+		const renderPass = new RenderPass();
+		composer.addPass(renderPass);
 
 		if (!MathUtils.isPowerOfTwo(textureWidth) || !MathUtils.isPowerOfTwo(textureHeight)) {
 			renderTarget.texture.generateMipmaps = false;
@@ -163,7 +171,12 @@ class Reflector extends Mesh {
 			renderer.state.buffers.depth.setMask(true); // make sure the depth buffer is writable so it can be properly cleared, see #18897
 
 			if (renderer.autoClear === false) renderer.clear();
-			renderer.render(scene, virtualCamera);
+
+			renderPass.needsSwap = false;
+			renderPass.camera = virtualCamera;
+			renderPass.scene = scene;
+			composer.renderer = renderer;
+			composer.render();
 
 			renderer.xr.enabled = currentXrEnabled;
 			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
@@ -242,13 +255,14 @@ Reflector.ReflectorShader = {
 		varying vec4 vUv;
 		varying vec2 originalUv;
 		#include <logdepthbuf_pars_fragment>
-		
+
 		uniform float gaussianOffsets[3];
 		uniform float gaussianWeights[3];
 
 		vec4 gaussianBlur(vec2 center) {
 			vec4 fragColor = texture2D(tDiffuse, center) * gaussianWeights[0];
 			for (int i=1; i<3; i++) {
+				// Blur in y direction
 				fragColor +=
 					texture2D(tDiffuse, (center + vec2(0.0, gaussianOffsets[i] / textureHeight)))
 						* gaussianWeights[i];
