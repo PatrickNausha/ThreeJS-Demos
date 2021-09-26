@@ -15,6 +15,7 @@ import {
 } from "three";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { BloomPass } from "three/examples/jsm/postprocessing/BloomPass";
 
 class Reflector extends Mesh {
 	constructor(geometry, options = {}) {
@@ -60,6 +61,8 @@ class Reflector extends Mesh {
 		composer.renderToScreen = false;
 		const renderPass = new RenderPass();
 		composer.addPass(renderPass);
+		const bloomPass = new BloomPass(1, 12, 2);
+		composer.addPass(bloomPass);
 
 		if (!MathUtils.isPowerOfTwo(textureWidth) || !MathUtils.isPowerOfTwo(textureHeight)) {
 			renderTarget.texture.generateMipmaps = false;
@@ -223,14 +226,6 @@ Reflector.ReflectorShader = {
 		textureHeight: {
 			value: null,
 		},
-
-		gaussianOffsets: {
-			value: [0.0, 1.3846153846, 3.2307692308],
-		},
-
-		gaussianWeights: {
-			value: [0.227027027, 0.3162162162, 0.0702702703],
-		},
 	},
 
 	vertexShader: /* glsl */ `
@@ -256,23 +251,6 @@ Reflector.ReflectorShader = {
 		varying vec2 originalUv;
 		#include <logdepthbuf_pars_fragment>
 
-		uniform float gaussianOffsets[3];
-		uniform float gaussianWeights[3];
-
-		vec4 gaussianBlur(vec2 center) {
-			vec4 fragColor = texture2D(tDiffuse, center) * gaussianWeights[0];
-			for (int i=1; i<3; i++) {
-				// Blur in y direction
-				fragColor +=
-					texture2D(tDiffuse, (center + vec2(0.0, gaussianOffsets[i] / textureHeight)))
-						* gaussianWeights[i];
-				fragColor +=
-					texture2D(tDiffuse, (center - vec2(0.0, gaussianOffsets[i] / textureHeight)))
-						* gaussianWeights[i];
-			}
-			return fragColor;
-		}
-
 		float blendOverlay( float base, float blend ) {
 			return( base < 0.5 ? ( 2.0 * base * blend ) : ( 1.0 - 2.0 * ( 1.0 - base ) * ( 1.0 - blend ) ) );
 		}
@@ -283,7 +261,7 @@ Reflector.ReflectorShader = {
 			#include <logdepthbuf_fragment>
 			vec2 vUv2d = (vUv.xy / vUv.q);
 
-			vec4 base = gaussianBlur(vUv2d);
+			vec4 base = texture2D(tDiffuse, vUv2d);
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
 		}`,
 };
