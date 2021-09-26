@@ -61,7 +61,7 @@ class Reflector extends Mesh {
 		composer.renderToScreen = false;
 		const renderPass = new RenderPass();
 		composer.addPass(renderPass);
-		const bloomPass = new BloomPass(1, 12, 2);
+		const bloomPass = new BloomPass(1, 13, 2, 1024);
 		composer.addPass(bloomPass);
 
 		if (!MathUtils.isPowerOfTwo(textureWidth) || !MathUtils.isPowerOfTwo(textureHeight)) {
