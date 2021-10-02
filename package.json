@@ -4,13 +4,17 @@
 	"private": true,
 	"author": "PatrickNausha",
 	"scripts": {
-		"dev": "parcel index.html assets/**/*",
+		"dev": "parcel index.html",
 		"build": "rm -rf ./dist && NODE_ENV=production parcel build index.html --public-url ./",
 		"deploy": "gh-pages -d dist"
 	},
 	"devDependencies": {
 		"dat.gui": "^0.7.7",
-		"gh-pages": "^3.0.0"
+		"gh-pages": "^3.0.0",
+		"parcel-plugin-static-files-copy": "^2.6.0"
+	},
+	"staticFiles": {
+		"watcherGlob": "**"
 	},
 	"dependencies": {
 		"stats-js": "^1.0.1",
