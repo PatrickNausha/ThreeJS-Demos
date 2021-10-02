@@ -55,15 +55,15 @@ function init() {
 		textureHeight: window.innerHeight * window.devicePixelRatio,
 		color: 0xffffff,
 		transparent: true,
-		opacity: 1.0,
+		opacity: 0.2,
 		depthFunc: THREE.EqualDepth, // Match ground depth exactly
 	});
 	groundMirror.rotateX(-Math.PI / 2);
 	groundMirror.rotateZ(Math.PI / 4);
-	// scene.add(groundMirror);
+	scene.add(groundMirror);
 
 	const matStdFloor = new THREE.MeshStandardMaterial({
-		color: 0x707070,
+		color: 0xffffff,
 		roughness: 0.2,
 		metalness: 0,
 		normalMap: concreteNormalMap,
@@ -78,7 +78,7 @@ function init() {
 	const matKnot = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0, metalness: 0 });
 	const meshKnot = new THREE.Mesh(geoKnot, matKnot);
 	meshKnot.name = "meshKnot";
-	meshKnot.position.set(0, 5, 50);
+	meshKnot.position.set(0, 5, 64);
 	// meshKnot.visible = false;
 	scene.add(meshKnot);
 

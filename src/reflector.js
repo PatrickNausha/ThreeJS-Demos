@@ -61,7 +61,7 @@ class Reflector extends Mesh {
 		composer.renderToScreen = false;
 		const renderPass = new RenderPass();
 		composer.addPass(renderPass);
-		const bloomPass = new BloomPass(1, 13, 2, 1024);
+		const bloomPass = new BloomPass(1, 25, 4, 1024);
 		composer.addPass(bloomPass);
 
 		if (!MathUtils.isPowerOfTwo(textureWidth) || !MathUtils.isPowerOfTwo(textureHeight)) {
@@ -72,10 +72,13 @@ class Reflector extends Mesh {
 			uniforms: UniformsUtils.clone(shader.uniforms),
 			fragmentShader: shader.fragmentShader,
 			vertexShader: shader.vertexShader,
+			transparent: options.transparent,
+			opacity: options.opacity,
 		});
 
 		material.uniforms["tDiffuse"].value = renderTarget.texture;
 		material.uniforms["color"].value = color;
+		material.uniforms["opacity"].value = material.opacity || 1;
 		material.uniforms["textureMatrix"].value = textureMatrix;
 		material.uniforms["textureWidth"].value = textureWidth;
 		material.uniforms["textureHeight"].value = textureHeight;
@@ -226,6 +229,10 @@ Reflector.ReflectorShader = {
 		textureHeight: {
 			value: null,
 		},
+
+		opacity: {
+			value: null,
+		},
 	},
 
 	vertexShader: /* glsl */ `
@@ -247,6 +254,7 @@ Reflector.ReflectorShader = {
 		uniform sampler2D tDiffuse;
 		uniform float textureWidth;
 		uniform float textureHeight;
+		uniform float opacity;
 		varying vec4 vUv;
 		varying vec2 originalUv;
 		#include <logdepthbuf_pars_fragment>
@@ -262,7 +270,7 @@ Reflector.ReflectorShader = {
 			vec2 vUv2d = (vUv.xy / vUv.q);
 
 			vec4 base = texture2D(tDiffuse, vUv2d);
-			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
+			gl_FragColor = vec4( blendOverlay( base.rgb, color ), opacity );
 		}`,
 };
 
