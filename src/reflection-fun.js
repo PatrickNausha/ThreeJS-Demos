@@ -31,42 +31,36 @@ function init() {
 	scene = new THREE.Scene();
 
 	RectAreaLightUniformsLib.init();
-	rectLight1 = new THREE.RectAreaLight(0x8ce2dd, 5, 4, 24);
-	rectLight1.position.set(-5, 12, 5);
+	rectLight1 = new THREE.RectAreaLight(0xdd2200, 5, 8, 50);
+	rectLight1.position.set(0, 22, 72);
 	scene.add(rectLight1);
 
-	rectLight2 = new THREE.RectAreaLight(0x21e7bd, 5, 4, 24);
-	rectLight2.position.set(0, 12, 5);
-	scene.add(rectLight2);
-
-	rectLight3 = new THREE.RectAreaLight(0xefa20e, 5, 4, 24);
-	rectLight3.position.set(5, 12, 5);
-	scene.add(rectLight3);
-
 	rectLightHelper1 = new RectAreaLightHelper(rectLight1);
-	rectLightHelper2 = new RectAreaLightHelper(rectLight2);
-	rectLightHelper3 = new RectAreaLightHelper(rectLight3);
+	// rectLightHelper2 = new RectAreaLightHelper(rectLight2);
+	// rectLightHelper3 = new RectAreaLightHelper(rectLight3);
 
-	rectLight1.visible = false;
-	rectLightHelper1.visible = false;
-	rectLight2.visible = false;
-	rectLightHelper2.visible = false;
-	rectLight3.visible = false;
-	rectLightHelper3.visible = false;
+	// rectLight1.visible = false;
+	// rectLightHelper1.visible = false;
+	// rectLight2.visible = false;
+	// rectLightHelper2.visible = false;
+	// rectLight3.visible = false;
+	// rectLightHelper3.visible = false;
 
 	scene.add(rectLightHelper1);
-	scene.add(rectLightHelper2);
-	scene.add(rectLightHelper3);
 
 	const geoFloor = new THREE.PlaneGeometry(100, 100);
 	const groundMirror = new Reflector(geoFloor, {
 		clipBias: 0.003,
 		textureWidth: window.innerWidth * window.devicePixelRatio,
 		textureHeight: window.innerHeight * window.devicePixelRatio,
-		color: 0x777777,
+		color: 0xffffff,
+		transparent: true,
+		opacity: 1.0,
+		depthFunc: THREE.EqualDepth, // Match ground depth exactly
 	});
 	groundMirror.rotateX(-Math.PI / 2);
-	scene.add(groundMirror);
+	groundMirror.rotateZ(Math.PI / 4);
+	// scene.add(groundMirror);
 
 	const matStdFloor = new THREE.MeshStandardMaterial({
 		color: 0x707070,
@@ -74,19 +68,18 @@ function init() {
 		metalness: 0,
 		normalMap: concreteNormalMap,
 		map: concreteDiffuseMap,
-		transparent: true,
-		opacity: 0.9,
-		depthFunc: THREE.EqualDepth, // Match reflector depth exactly
 	});
 	const mshStdFloor = new THREE.Mesh(geoFloor, matStdFloor);
-	mshStdFloor.rotation.x = -Math.PI / 2;
+	mshStdFloor.rotateX(-Math.PI / 2);
+	mshStdFloor.rotateZ(Math.PI / 4);
 	scene.add(mshStdFloor);
 
 	const geoKnot = new THREE.TorusKnotGeometry(1.5, 0.5, 200, 16);
 	const matKnot = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0, metalness: 0 });
 	const meshKnot = new THREE.Mesh(geoKnot, matKnot);
 	meshKnot.name = "meshKnot";
-	meshKnot.position.set(0, 5, 0);
+	meshKnot.position.set(0, 5, 50);
+	// meshKnot.visible = false;
 	scene.add(meshKnot);
 
 	const controls = new OrbitControls(camera, renderer.domElement);
@@ -107,7 +100,7 @@ const tonePromise = new Promise((resolve) => {
 	resolveTonePromise = resolve;
 });
 document.body.addEventListener("click", () => {
-	Tone.start().then(resolveTonePromise);
+	// Tone.start().then(resolveTonePromise);
 });
 
 function onWindowResize() {
