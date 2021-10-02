@@ -5,6 +5,7 @@ import { Reflector } from "./reflector";
 import { RectAreaLightHelper } from "three/examples/jsm/helpers/RectAreaLightHelper";
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib";
 import { updateStats, toggleStats } from "./debug-stats";
+import { slamItOnTheGround } from "./positioning";
 
 let renderer, scene, camera, rectLight1, rectLight2, rectLight3, rectLightHelper1, rectLightHelper2, rectLightHelper3;
 
@@ -21,26 +22,29 @@ function init() {
 	document.body.appendChild(renderer.domElement);
 
 	camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-	camera.position.set(0, 5, -15);
+	camera.position.set(0, 12, -15);
 
 	scene = new THREE.Scene();
 
+	const worldSize = 480;
+	const lightWidth = 20;
+	const lightGap = 8;
 	RectAreaLightUniformsLib.init();
-	rectLight1 = new THREE.RectAreaLight(0x8ce2dd, 5, 4, 24);
-	rectLight1.position.set(-5, 12, 5);
+	rectLight1 = new THREE.RectAreaLight(0x90e5de, 5, lightWidth, worldSize / 2);
+	rectLight1.position.set(-lightWidth - lightGap, 24, worldSize / 2);
 	scene.add(rectLight1);
 
-	rectLight2 = new THREE.RectAreaLight(0x21e7bd, 5, 4, 24);
-	rectLight2.position.set(0, 12, 5);
+	rectLight2 = new THREE.RectAreaLight(0x21e7bd, 5, lightWidth, worldSize / 2);
+	rectLight2.position.set(0, 24, worldSize / 2);
 	scene.add(rectLight2);
 
-	rectLight3 = new THREE.RectAreaLight(0xefa20e, 5, 4, 24);
-	rectLight3.position.set(5, 12, 5);
+	rectLight3 = new THREE.RectAreaLight(0xefa20e, 5, lightWidth, worldSize / 2);
+	rectLight3.position.set(lightWidth + lightGap, 24, worldSize / 2);
 	scene.add(rectLight3);
 
-	rectLightHelper1 = new RectAreaLightHelper(rectLight1);
-	rectLightHelper2 = new RectAreaLightHelper(rectLight2);
-	rectLightHelper3 = new RectAreaLightHelper(rectLight3);
+	rectLightHelper1 = new RectAreaLightHelper(rectLight1, 0x4ee9bf);
+	rectLightHelper2 = new RectAreaLightHelper(rectLight2, 0x21e7bd);
+	rectLightHelper3 = new RectAreaLightHelper(rectLight3, 0xeda401);
 
 	// rectLight1.visible = false;
 	// rectLightHelper1.visible = false;
@@ -53,7 +57,7 @@ function init() {
 	scene.add(rectLightHelper2);
 	scene.add(rectLightHelper3);
 
-	const geoFloor = new THREE.PlaneGeometry(100, 100);
+	const geoFloor = new THREE.PlaneGeometry(worldSize, worldSize);
 	const groundMirror = new Reflector(geoFloor, {
 		clipBias: 0.003,
 		textureWidth: window.innerWidth * window.devicePixelRatio,
@@ -68,22 +72,32 @@ function init() {
 		roughness: 0.2,
 		metalness: 0,
 		transparent: true,
-		opacity: 0.9,
+		opacity: 0.5,
 		depthFunc: THREE.EqualDepth, // Match reflector depth exactly
 	});
 	const mshStdFloor = new THREE.Mesh(geoFloor, matStdFloor);
 	mshStdFloor.rotation.x = -Math.PI / 2;
 	scene.add(mshStdFloor);
 
-	const geoKnot = new THREE.TorusKnotGeometry(1.5, 0.5, 200, 16);
-	const matKnot = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0, metalness: 0 });
-	const meshKnot = new THREE.Mesh(geoKnot, matKnot);
-	meshKnot.name = "meshKnot";
-	meshKnot.position.set(0, 5, 0);
-	scene.add(meshKnot);
+	const geoKnot = new THREE.TetrahedronGeometry(4);
+	geoKnot.applyMatrix4(
+		new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(1, 0, -1).normalize(), Math.atan(Math.sqrt(2)))
+	);
+	const matKnot = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0, metalness: 0.9 });
+	const minX = -100;
+	const maxX = 100;
+	const minZ = 20;
+	const maxZ = 200;
+	for (let x = minX; x < maxX; x += 20) {
+		for (let z = minZ; z < maxZ; z += 20) {
+			const meshKnot = new THREE.Mesh(geoKnot, matKnot);
+			slamItOnTheGround(meshKnot, x, z);
+			scene.add(meshKnot);
+		}
+	}
 
 	const controls = new OrbitControls(camera, renderer.domElement);
-	controls.target.copy(meshKnot.position);
+	controls.target.set(0, 12, 10);
 	controls.update();
 
 	window.addEventListener("resize", onWindowResize);
@@ -110,8 +124,8 @@ function onWindowResize() {
 }
 
 function animation(time) {
-	const mesh = scene.getObjectByName("meshKnot");
-	mesh.rotation.y = time / 1000;
+	// const mesh = scene.getObjectByName("meshKnot");
+	// mesh.rotation.y = time / 1000;
 
 	renderer.render(scene, camera);
 	updateStats();

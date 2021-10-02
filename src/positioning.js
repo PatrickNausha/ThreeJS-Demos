@@ -1,11 +1,11 @@
 import { Vector3 } from "three";
 
-export function slamItOnTheGround(mesh, x, z, groundLevel) {
+export function slamItOnTheGround(mesh, x, z, groundLevel = 0) {
 	if (!mesh.geometry.boundingBox) {
 		mesh.geometry.computeBoundingBox();
 	}
 	mesh.position.x = x;
-	mesh.position.y = 0 - mesh.geometry.boundingBox.min.y;
+	mesh.position.y = groundLevel - mesh.geometry.boundingBox.min.y;
 	mesh.position.z = z;
 }
 
