@@ -23,7 +23,6 @@ function init() {
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.setAnimationLoop(animation);
-	renderer.outputEncoding = THREE.sRGBEncoding;
 	document.body.appendChild(renderer.domElement);
 
 	const textureLoader = new THREE.TextureLoader();
@@ -42,8 +41,8 @@ function init() {
 	RectAreaLightUniformsLib.init();
 	const lightWidth = 8;
 	const lightHeight = 50;
-	const lightColor = 0xdd2200;
-	rectLight1 = new THREE.RectAreaLight(lightColor, 5, lightWidth, lightHeight);
+	const lightColor = 0xff7700;
+	rectLight1 = new THREE.RectAreaLight(lightColor, 10, lightWidth, lightHeight);
 	const areaLightPlaneGeometry = new THREE.PlaneGeometry(lightWidth, lightHeight);
 	const areaLightPlane = new THREE.Mesh(
 		areaLightPlaneGeometry,
@@ -107,7 +106,6 @@ function init() {
 		bloomStrength: 1,
 		bloomThreshold: 0,
 		bloomRadius: 1,
-		scene: "Scene with Glow",
 	};
 	bloomPass.threshold = params.bloomThreshold;
 	bloomPass.strength = params.bloomStrength;
@@ -131,7 +129,6 @@ function init() {
 					vUv = uv;
 					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 				}`,
-
 			fragmentShader: `
 				uniform sampler2D baseTexture;
 				uniform sampler2D bloomTexture;
