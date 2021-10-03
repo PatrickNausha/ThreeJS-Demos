@@ -4,8 +4,22 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Reflector } from "./reflector";
 import { RectAreaLightHelper } from "three/examples/jsm/helpers/RectAreaLightHelper";
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 
-let renderer, scene, camera, rectLight1, rectLight2, rectLight3, rectLightHelper1, rectLightHelper2, rectLightHelper3;
+let renderer,
+	scene,
+	bloomComposer,
+	camera,
+	finalComposer,
+	rectLight1,
+	rectLight2,
+	rectLight3,
+	rectLightHelper1,
+	rectLightHelper2,
+	rectLightHelper3;
 
 init();
 
@@ -36,17 +50,9 @@ function init() {
 	scene.add(rectLight1);
 
 	rectLightHelper1 = new RectAreaLightHelper(rectLight1);
-	// rectLightHelper2 = new RectAreaLightHelper(rectLight2);
-	// rectLightHelper3 = new RectAreaLightHelper(rectLight3);
-
-	// rectLight1.visible = false;
-	// rectLightHelper1.visible = false;
-	// rectLight2.visible = false;
-	// rectLightHelper2.visible = false;
-	// rectLight3.visible = false;
-	// rectLightHelper3.visible = false;
 
 	scene.add(rectLightHelper1);
+	rectLightHelper1.layers.enable(BLOOM_SCENE);
 
 	const geoFloor = new THREE.PlaneGeometry(100, 100);
 	const groundMirror = new Reflector(geoFloor, {
@@ -60,7 +66,13 @@ function init() {
 	});
 	groundMirror.rotateX(-Math.PI / 2);
 	groundMirror.rotateZ(Math.PI / 4);
-	scene.add(groundMirror);
+	// scene.add(groundMirror);
+
+	const BLOOM_SCENE = 1;
+	const bloomLayer = new THREE.Layers();
+	bloomLayer.set(BLOOM_SCENE);
+
+	const darkMaterial = new THREE.MeshBasicMaterial({ color: "black" });
 
 	const matStdFloor = new THREE.MeshStandardMaterial({
 		color: 0xffffff,
@@ -87,6 +99,58 @@ function init() {
 	controls.update();
 
 	window.addEventListener("resize", onWindowResize);
+
+	// Add render passes
+	const renderPass = new RenderPass(scene, camera);
+	const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+	const params = {
+		exposure: 1,
+		bloomStrength: 1,
+		bloomThreshold: 0,
+		bloomRadius: 1,
+		scene: "Scene with Glow",
+	};
+	bloomPass.threshold = params.bloomThreshold;
+	bloomPass.strength = params.bloomStrength;
+	bloomPass.radius = params.bloomRadius;
+
+	bloomComposer = new EffectComposer(renderer);
+	bloomComposer.renderToScreen = false;
+	bloomComposer.addPass(renderPass); // We'll darken non-bloomy things
+	bloomComposer.addPass(bloomPass);
+
+	const finalPass = new ShaderPass(
+		new THREE.ShaderMaterial({
+			uniforms: {
+				baseTexture: { value: null },
+				bloomTexture: { value: bloomComposer.renderTarget2.texture },
+			},
+			vertexShader: `
+				varying vec2 vUv;
+
+				void main() {
+					vUv = uv;
+					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+				}`,
+
+			fragmentShader: `
+				uniform sampler2D baseTexture;
+				uniform sampler2D bloomTexture;
+
+				varying vec2 vUv;
+
+				void main() {
+					gl_FragColor = ( texture2D( baseTexture, vUv ) + vec4( 1.0 ) * texture2D( bloomTexture, vUv ) );
+				}`,
+			defines: {},
+		}),
+		"baseTexture"
+	);
+	finalPass.needsSwap = true;
+
+	finalComposer = new EffectComposer(renderer);
+	finalComposer.addPass(renderPass);
+	finalComposer.addPass(finalPass);
 }
 
 // const dist = new Tone.PingPongDelay("8n", 0.8).toDestination();
@@ -113,7 +177,8 @@ function animation(time) {
 	const mesh = scene.getObjectByName("meshKnot");
 	mesh.rotation.y = time / 1000;
 
-	renderer.render(scene, camera);
+	bloomComposer.render(scene, camera); // Render into bloom texture
+	finalComposer.render(scene, camera);
 }
 
 tonePromise.then(() => {
