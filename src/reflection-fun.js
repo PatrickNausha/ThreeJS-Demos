@@ -8,18 +8,13 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
+import { MeshBasicMaterial } from "three";
 
-let renderer,
-	scene,
-	bloomComposer,
-	camera,
-	finalComposer,
-	rectLight1,
-	rectLight2,
-	rectLight3,
-	rectLightHelper1,
-	rectLightHelper2,
-	rectLightHelper3;
+let renderer, scene, bloomComposer, camera, finalComposer, rectLight1, rectLightHelper1;
+
+const BLOOM_SCENE = 1;
+const bloomLayer = new THREE.Layers();
+bloomLayer.set(BLOOM_SCENE);
 
 init();
 
@@ -45,14 +40,24 @@ function init() {
 	scene = new THREE.Scene();
 
 	RectAreaLightUniformsLib.init();
-	rectLight1 = new THREE.RectAreaLight(0xdd2200, 5, 8, 50);
+	const lightWidth = 8;
+	const lightHeight = 50;
+	const lightColor = 0xdd2200;
+	rectLight1 = new THREE.RectAreaLight(lightColor, 5, lightWidth, lightHeight);
+	const areaLightPlaneGeometry = new THREE.PlaneGeometry(lightWidth, lightHeight);
+	const areaLightPlane = new THREE.Mesh(
+		areaLightPlaneGeometry,
+		new MeshBasicMaterial({
+			color: lightColor,
+		})
+	);
+	areaLightPlane.rotateX(Math.PI);
 	rectLight1.position.set(0, 22, 72);
+	areaLightPlane.position.set(0, 22, 72);
 	scene.add(rectLight1);
+	scene.add(areaLightPlane);
 
-	rectLightHelper1 = new RectAreaLightHelper(rectLight1);
-
-	scene.add(rectLightHelper1);
-	rectLightHelper1.layers.enable(BLOOM_SCENE);
+	areaLightPlane.layers.enable(BLOOM_SCENE);
 
 	const geoFloor = new THREE.PlaneGeometry(100, 100);
 	const groundMirror = new Reflector(geoFloor, {
@@ -67,12 +72,6 @@ function init() {
 	groundMirror.rotateX(-Math.PI / 2);
 	groundMirror.rotateZ(Math.PI / 4);
 	// scene.add(groundMirror);
-
-	const BLOOM_SCENE = 1;
-	const bloomLayer = new THREE.Layers();
-	bloomLayer.set(BLOOM_SCENE);
-
-	const darkMaterial = new THREE.MeshBasicMaterial({ color: "black" });
 
 	const matStdFloor = new THREE.MeshStandardMaterial({
 		color: 0xffffff,
@@ -177,8 +176,32 @@ function animation(time) {
 	const mesh = scene.getObjectByName("meshKnot");
 	mesh.rotation.y = time / 1000;
 
-	bloomComposer.render(scene, camera); // Render into bloom texture
+	// Render bloom-enabled things to bloom texture
+	renderBloom();
+
 	finalComposer.render(scene, camera);
+}
+
+function renderBloom() {
+	scene.traverse(darkenNonBloomed);
+	bloomComposer.render();
+	scene.traverse(restoreDarkenedMaterial);
+}
+
+const darkMaterial = new THREE.MeshBasicMaterial({ color: "black" });
+const materials = {};
+function darkenNonBloomed(obj) {
+	if (obj.isMesh && bloomLayer.test(obj.layers) === false) {
+		materials[obj.uuid] = obj.material;
+		obj.material = darkMaterial;
+	}
+}
+
+function restoreDarkenedMaterial(obj) {
+	if (materials[obj.uuid]) {
+		obj.material = materials[obj.uuid];
+		delete materials[obj.uuid];
+	}
 }
 
 tonePromise.then(() => {
