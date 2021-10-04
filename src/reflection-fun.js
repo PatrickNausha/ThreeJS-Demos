@@ -8,6 +8,7 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
+import { FilmPass } from "three/examples/jsm/postprocessing/FilmPass";
 import { MeshBasicMaterial } from "three";
 
 let renderer, scene, bloomComposer, camera, finalComposer, groundMirror, rectLight1, rectLightHelper1;
@@ -19,7 +20,7 @@ bloomLayer.set(BLOOM_SCENE);
 init();
 
 function init() {
-	renderer = new THREE.WebGLRenderer({ antialias: true });
+	renderer = new THREE.WebGLRenderer();
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.setAnimationLoop(animation);
@@ -88,7 +89,7 @@ function init() {
 	const matKnot = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0, metalness: 0 });
 	const meshKnot = new THREE.Mesh(geoKnot, matKnot);
 	meshKnot.name = "meshKnot";
-	meshKnot.position.set(0, 5, 64);
+	meshKnot.position.set(0, 3, 24);
 	scene.add(meshKnot);
 
 	const controls = new OrbitControls(camera, renderer.domElement);
@@ -146,6 +147,7 @@ function init() {
 	finalComposer = new EffectComposer(renderer);
 	finalComposer.addPass(renderPass);
 	finalComposer.addPass(finalPass);
+	finalComposer.addPass(new FilmPass(0.35, 0, 0, false));
 }
 
 // const dist = new Tone.PingPongDelay("8n", 0.8).toDestination();
@@ -175,7 +177,7 @@ function animation(time) {
 	// Render bloom-enabled things to bloom texture
 	renderBloom();
 
-	finalComposer.render(scene, camera);
+	finalComposer.render(0.01); // 0.01 is arbitrary for film pass
 }
 
 function renderBloom() {
