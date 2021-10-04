@@ -10,7 +10,7 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 import { MeshBasicMaterial } from "three";
 
-let renderer, scene, bloomComposer, camera, finalComposer, rectLight1, rectLightHelper1;
+let renderer, scene, bloomComposer, camera, finalComposer, groundMirror, rectLight1, rectLightHelper1;
 
 const BLOOM_SCENE = 1;
 const bloomLayer = new THREE.Layers();
@@ -41,7 +41,7 @@ function init() {
 	RectAreaLightUniformsLib.init();
 	const lightWidth = 8;
 	const lightHeight = 50;
-	const lightColor = 0xff7700;
+	const lightColor = 0xff5500;
 	rectLight1 = new THREE.RectAreaLight(lightColor, 10, lightWidth, lightHeight);
 	const areaLightPlaneGeometry = new THREE.PlaneGeometry(lightWidth, lightHeight);
 	const areaLightPlane = new THREE.Mesh(
@@ -59,18 +59,18 @@ function init() {
 	areaLightPlane.layers.enable(BLOOM_SCENE);
 
 	const geoFloor = new THREE.PlaneGeometry(100, 100);
-	const groundMirror = new Reflector(geoFloor, {
+	groundMirror = new Reflector(geoFloor, {
 		clipBias: 0.003,
 		textureWidth: window.innerWidth * window.devicePixelRatio,
 		textureHeight: window.innerHeight * window.devicePixelRatio,
 		color: 0xffffff,
 		transparent: true,
-		opacity: 0.2,
+		opacity: 0.4,
 		depthFunc: THREE.EqualDepth, // Match ground depth exactly
 	});
 	groundMirror.rotateX(-Math.PI / 2);
 	groundMirror.rotateZ(Math.PI / 4);
-	// scene.add(groundMirror);
+	scene.add(groundMirror);
 
 	const matStdFloor = new THREE.MeshStandardMaterial({
 		color: 0xffffff,
@@ -89,7 +89,6 @@ function init() {
 	const meshKnot = new THREE.Mesh(geoKnot, matKnot);
 	meshKnot.name = "meshKnot";
 	meshKnot.position.set(0, 5, 64);
-	// meshKnot.visible = false;
 	scene.add(meshKnot);
 
 	const controls = new OrbitControls(camera, renderer.domElement);
@@ -181,8 +180,10 @@ function animation(time) {
 
 function renderBloom() {
 	scene.traverse(darkenNonBloomed);
+	groundMirror.visible = false;
 	bloomComposer.render();
 	scene.traverse(restoreDarkenedMaterial);
+	groundMirror.visible = true;
 }
 
 const darkMaterial = new THREE.MeshBasicMaterial({ color: "black" });
