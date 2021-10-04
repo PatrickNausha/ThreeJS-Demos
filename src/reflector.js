@@ -57,11 +57,18 @@ class Reflector extends Mesh {
 		const renderTarget = new WebGLRenderTarget(textureWidth, textureHeight, parameters);
 		renderTarget.texture.name = "reflector-render-target";
 		const composer = new EffectComposer(null, renderTarget);
-		composer.swapBuffers();
+		composer.swapBuffers(); // Move renderTarget into the read buffer.
 		composer.renderToScreen = false;
+
 		const renderPass = new RenderPass();
 		composer.addPass(renderPass);
+
 		const bloomPass = new BloomPass(1, 25, 4, 1024);
+
+		// Achieve blur effect by clearing render target instead of superimposing on top of
+		// rendered scene.
+		bloomPass.clear = true;
+
 		composer.addPass(bloomPass);
 
 		if (!MathUtils.isPowerOfTwo(textureWidth) || !MathUtils.isPowerOfTwo(textureHeight)) {
