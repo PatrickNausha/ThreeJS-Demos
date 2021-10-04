@@ -34,7 +34,7 @@ function init() {
 	concreteNormalMap.repeat.set(10, 10);
 
 	camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-	camera.position.set(0, 5, -15);
+	camera.position.set(0, 15, -25);
 
 	scene = new THREE.Scene();
 
@@ -51,8 +51,8 @@ function init() {
 		})
 	);
 	areaLightPlane.rotateX(Math.PI);
-	rectLight1.position.set(0, 22, 72);
-	areaLightPlane.position.set(0, 22, 72);
+	rectLight1.position.set(0, lightHeight / 2, 66.8);
+	areaLightPlane.position.set(0, lightHeight / 2, 66.8);
 	scene.add(rectLight1);
 	scene.add(areaLightPlane);
 
@@ -92,7 +92,7 @@ function init() {
 	scene.add(meshKnot);
 
 	const controls = new OrbitControls(camera, renderer.domElement);
-	controls.target.copy(meshKnot.position);
+	controls.target.set(0, 15, 100);
 	controls.update();
 
 	window.addEventListener("resize", onWindowResize);
