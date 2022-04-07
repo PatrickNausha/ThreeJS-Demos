@@ -5,7 +5,7 @@
 	"author": "PatrickNausha",
 	"scripts": {
 		"dev": "parcel index.html",
-		"build": "rm -rf ./dist && NODE_ENV=production parcel build index.html --public-url ./",
+		"build": "rm -rf ./dist ./.parcel-cache && NODE_ENV=production parcel build index.html --public-url ./",
 		"deploy": "gh-pages -d dist"
 	},
 	"devDependencies": {
