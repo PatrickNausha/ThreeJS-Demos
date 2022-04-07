@@ -93,6 +93,7 @@ function init() {
 	const controls = new OrbitControls(camera, renderer.domElement);
 	controls.target.set(0, 15, 100);
 	controls.update();
+	controls.enabled = false;
 
 	window.addEventListener("resize", onWindowResize);
 
