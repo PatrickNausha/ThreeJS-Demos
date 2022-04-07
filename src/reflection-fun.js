@@ -1,8 +1,6 @@
 import * as THREE from "three";
-import * as Tone from "tone";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { Reflector } from "./reflector";
-import { RectAreaLightHelper } from "three/examples/jsm/helpers/RectAreaLightHelper";
 import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
@@ -150,20 +148,6 @@ function init() {
 	finalComposer.addPass(new FilmPass(0.35, 0, 0, false));
 }
 
-// const dist = new Tone.PingPongDelay("8n", 0.8).toDestination();
-const synth = new Tone.PolySynth(Tone.Synth);
-// synth.connect(dist);
-synth.toDestination();
-
-//create a synth and connect it to the main output (your speakers)
-let resolveTonePromise;
-const tonePromise = new Promise((resolve) => {
-	resolveTonePromise = resolve;
-});
-document.body.addEventListener("click", () => {
-	// Tone.start().then(resolveTonePromise);
-});
-
 function onWindowResize() {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	camera.aspect = window.innerWidth / window.innerHeight;
@@ -203,38 +187,3 @@ function restoreDarkenedMaterial(obj) {
 		delete materials[obj.uuid];
 	}
 }
-
-tonePromise.then(() => {
-	setInterval(() => {
-		rectLight1.visible = !rectLight1.visible;
-		rectLightHelper1.visible = !rectLightHelper1.visible;
-
-		if (rectLight1.visible) {
-			synth.triggerAttack("C3");
-		} else {
-			synth.triggerRelease("C3");
-		}
-	}, 1000);
-
-	setInterval(() => {
-		rectLight2.visible = !rectLight2.visible;
-		rectLightHelper2.visible = !rectLightHelper2.visible;
-
-		if (rectLight2.visible) {
-			synth.triggerAttack("E3");
-		} else {
-			synth.triggerRelease("E3");
-		}
-	}, 500);
-
-	setInterval(() => {
-		rectLight3.visible = !rectLight3.visible;
-		rectLightHelper3.visible = !rectLightHelper3.visible;
-
-		if (rectLight3.visible) {
-			synth.triggerAttack("G3");
-		} else {
-			synth.triggerRelease("G3");
-		}
-	}, 1250);
-});
