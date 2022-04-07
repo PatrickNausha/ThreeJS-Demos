@@ -253,4 +253,7 @@ function animate(time) {
 	composer.render(scene, camera);
 	updateStats();
 }
-animate();
+
+if (window.confirm('WARNING. This example may potentially trigger seizures for people with photosensitive epilepsy.')) {
+	animate();
+}
