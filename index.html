@@ -127,7 +127,40 @@
 
 	<h2><a href="./svg.html">SVG</a></h2>
 	<h2><a href="./confetti-text-glow.html">Confetti, Text, and Glow</a></h2>
-
+	<h3>
+		Goal
+	</h3>
+	<p>
+		Create a text slide that leverages real-time 3D graphics.
+	</p>
+	<h3>
+		Why?
+	</h3>
+	<p>
+		Solve a real-world problem using ThreeJS.
+	</p>
+	<h3>What I learned/what was new for me</h3>
+	<p>
+		<a href="https://faithlife.com">My current employer</a> creates <a
+			href="https://faithlife.com/products/proclaim">Proclaim</a>, a church presentation software application
+		and <a href="https://media.faithlife.com/">sells media</a> to be used on-screen in churches, e.g. <a
+			href="https://media.faithlife.com/media/6083-glowing-rain-countdown-3-min">this countdown</a>.
+		Currently most of our graphics/media are dynamic 2D slides or static, pre-rendered 3D slides.
+		What if instead Proclaim could leverage a broadly supported graphics API like WebGL or OpenGL ES
+		to make its 3D content dynamic? Churches could modify the 3D graphics with custom text or other options.
+		Proclaim could use <a href="https://en.wikipedia.org/wiki/Chromium_Embedded_Framework">CEF</a> to
+		embed a WebGL page in the app and render WebGL scenes to a projector.
+		Faithlife's <a href="https://faithlife.com/products/digital-signage">digital signage</a> system is already
+		browser-based
+		so the WebGL scenes should work for signs as well.
+	</p>
+	<p>
+		Unfortunately it turned out that the cost of creating these 3D dynamic scenes would not be economical for
+		Faithlife.
+		Faithlife can produce pre-rendered 2D and 3D static content cost-effectively using existing tools
+		that do not require expensive software engineering effort. Building many of these 3D micro-scenes/apps
+		may be too expensive to profit off of them.
+	</p>
 	<h2><a href="./fun-with-sorting-demo.html">Transparency, depth buffer, and sorting playground.</a></h2>
 	<h3>
 		Goal
