@@ -13,50 +13,104 @@
 		canvas {
 			display: block;
 		}
+
+		.code-block {
+			display: block;
+		}
 	</style>
 </head>
 
 <body>
 	<p>For best results, open this page in Google Chrome 99 or newer.</p>
-	<h1>ThreeJS demos</h1>
-	<p>The following are demo apps I created for the purpose of learning ThreeJS, WebGL, or 3D math.
+	<h1>Patrick Nausha's ThreeJS demos</h1>
+	<p>The following are demo apps I created for the purpose of learning ThreeJS, WebGL, and 3D math.
 	</p>
 	<h2><a href="./hologram.html">Hologram Shader</a></h2>
+	<h3>
+		Goal
+	</h3>
 	<p>
-		Goal: Implement a shader that can be used to render a <a href="https://starwars.fandom.com/wiki/Hologram">Star Wars</a>-inspired hologram.
+		Implement a shader that can be used to render a <a href="https://starwars.fandom.com/wiki/Hologram">Star Wars</a>-inspired hologram.
 	</p>
+	<h3>Why?</h3>
 	<p>
-		Why? Learn to write a GLSL shader.
+		Learn to write a GLSL shader.
 	</p>
+	<h3>What I learned/what was new for me</h3>
 	<p>
-		What I learned/what was new for me:
-		This was my first time creating my own lighting model. Since a hologram is intentionally not photorealistic, I decided I could use simple <a href="https://en.wikipedia.org/wiki/Lambertian_reflectance#Use_in_computer_graphics">Lambertian reflectance</a>. For this I used a hard-coded light direction and the normal vector from the vertex shader.
-		<code>
-			vec3 lightDirection = normalize(vec3(0.7, 0.5, 1.0));
-			float diffuse = max(dot(vNormal, lightDirection), 0.0);
-		</code>
-		<h4>Converting vectors from screen space to world space.</h4>
+		This was my first time creating my own lighting. Since a hologram is intentionally not photorealistic, I decided I could use simple <a href="https://en.wikipedia.org/wiki/Lambertian_reflectance#Use_in_computer_graphics">Lambertian reflectance</a>. For this I used a hard-coded light direction and the normal vector from the vertex shader:
+	</p>
+	<code class="code-block">
+		vec3 lightDirection = normalize(vec3(0.7, 0.5, 1.0));<br>
+		float diffuse = max(dot(vNormal, lightDirection), 0.0);
+	</code>
+	<h4>Converting vectors from screen space to world space.</h4>
+	<p>
 		In Star Wars, holograms have noise (presumably due to poor transmission).
 		These can distort the image dramatically.
 		We want the geometry to occasionally skew and distort in a chaotic way.
 		I offset a given mesh's vertices by a "noise shift" vector representing the amount of skewing caused by transmission noise.
 		To make this look proper from every angle, I decided we should move the geometry to the viewer's left and right.
 		Instead of moving the geometry along the wold space X axis, I used the inverse view matrix to find a point in 3D space to the viewer's left and right of the proper location.
-		<code>
-			vec4 noiseShift = inverseViewMatrix * vec4(wiggleFactor * sin(x / 3.0) * sin(x / 13.0), 0.0, 0.0, 0.0);
-			vec3 shiftedPosition = noiseShift.xyz / 7.0 + position;
-			vec4 mvPosition = modelViewMatrix * vec4(shiftedPosition, 1.0);
-			gl_Position = projectionMatrix * mvPosition;
-		</code>
 	</p>
+	<code class="code-block">
+		vec4 noiseShift = inverseViewMatrix * vec4(wiggleFactor * sin(x / 3.0) * sin(x / 13.0), 0.0, 0.0, 0.0);
+		vec3 shiftedPosition = noiseShift.xyz / 7.0 + position;
+		vec4 mvPosition = modelViewMatrix * vec4(shiftedPosition, 1.0);
+		gl_Position = projectionMatrix * mvPosition;
+	</code>
 	<h2><a href="./fun-with-transformations-demo.html">Reflecting an object across a plane</a></h2>
+	<h3>Goal</h3>
+	<p>Reflect an object across a 3D plane using matrix transformations.</p>
+	<h3>Why?</h3>
+	<p>
+		Exercise my understanding of matrices and other 3D math concepts.
+	</p>
+	<h3>What I learned/what was new for me</h3>
+	<p>
+		Historically, a common solution for rendering reflections</a>, e.g. an object reflected in a mirror, was to render the object a second time with its vertices transformed to the mirrored <a href="https://en.wikipedia.org/wiki/Virtual_image">virtual</a> location.
+		I wanted to test my math skills with respect to 3D graphics/linear algebra by seeing if I could figure out how to do this on my own.
+		My solution ended up looking like the following. <code>reflection</code> is the reflected torus knot object.
+	</p>
+	<code class="code-block">
+		const reflectionMatrix = new Matrix4()<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;.multiply(planeGroup.matrix) // Convert from plane-local space to world space.<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;.multiply(new Matrix4().makeScale(1, 1, -1)) // Mirror it.<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;.multiply(new Matrix4().getInverse(planeGroup.matrix)) // Convert world space to plane-local space.<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;.multiply(meshMatrixCopy); // Convert mesh-local space to world space.<br>
+		reflection.matrix = reflectionMatrix;
+	</code>
+	<p>In short, I discovered you can solve this problem by converting the mesh's wold space coordinates to "mirror space" (a model space that is local to the mirror) and do the Z coordinate flipping (the mirroring operation) in "mirror space" coordinates.
+		Tip: If you're reading about 3D math and some multiplication operations look backwards to you, <a href="https://gamedev.stackexchange.com/questions/133529/difference-between-column-and-row-vector-matrix-multiplication-vector-transfor">the answer on this StackExchange question</a> helped me understand why.
+	</p>
 
 	<h2><a href="./reflection-fun.html">Reflection Shader</a></h2>
 
 	<h2><a href="./shadows.html">Shadows</a></h2>
 	<h2><a href="./svg.html">SVG</a></h2>
 	<h2><a href="./confetti-text-glow.html">Confetti, Text, and Glow</a></h2>
-	<h2><a href="./fun-with-sorting-demo.html">Transparency, depth buffer, and sorting playground</a></h2>
+
+	<h2><a href="./fun-with-sorting-demo.html">Transparency, depth buffer, and sorting playground.</a></h2>
+	<h3>
+		Goal
+	</h3>
+	<p>Create an application that lets you toggle meshes' transparency, depth buffer test usage usage, and sorting.</p>
+	<h3>
+		Why?
+	</h3>
+	<p>
+		Verify my understanding of how ThreeJS solves the problem of rendering multiple objects when some of the objects are translucent.
+	</p>
+	<h3>What I learned</h3>
+	<p>
+		Prior to creating this app, I discovered that sometimes <a href="https://www.khronos.org/opengl/wiki/Transparency_Sorting">transparent objects don't play nice</a> with depth buffers and other transparent objects. For example, how would you depth test opaque objects against translucent ones?
+		Your goal is to draw the object behind the translucent one. In contrast, with an ordinary depth test the goal is to avoid drawing farther objects on top of nearer ones.
+		By building an app where I can deconstruct and break things intentionally, what the ThreeJS docs suggested:
+	</p>
+	<ul>
+		<li>Opaque objects are drawn first.</li>
+		<li>Translucent objects are drawn from farthest to nearest.</li>
+		<li>This strategy is not 100% effective because objects can occlude themselves.</li>
 	</ul>
 </body>
 
