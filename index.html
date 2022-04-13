@@ -21,7 +21,7 @@
 </head>
 
 <body>
-	<p>For best results, open this page in Google Chrome 99 or newer.</p>
+	<p>For best results, open the demos in Google Chrome 99 or newer.</p>
 	<h1>Patrick Nausha's ThreeJS demos</h1>
 	<p>The following are demo apps I created for the purpose of learning ThreeJS, WebGL, and 3D math.
 	</p>
@@ -42,7 +42,8 @@
 		This was my first time creating my own lighting. Since a hologram is intentionally not photorealistic, I decided
 		I could use simple
 		<a href="https://en.wikipedia.org/wiki/Lambertian_reflectance#Use_in_computer_graphics">Lambertian
-			reflectance</a>. For this I used a hard-coded light direction and the normal vector from the vertex shader:
+			reflectance</a> alone. For this I used a hard-coded light direction and the normal vector from the vertex
+		shader:
 	</p>
 	<code class="code-block">
 		vec3 lightDirection = normalize(vec3(0.7, 0.5, 1.0));<br>
@@ -52,17 +53,21 @@
 	<p>
 		In Star Wars, holograms have noise (presumably due to poor transmission).
 		These can distort the image dramatically.
-		We want the geometry to occasionally skew and distort in a chaotic way.
+		We want a hologram's mesh geometry to occasionally skew and distort in a chaotic, but controlled, way. Try
+		changing the "wiggle" settings in the demo to see which effect I am referring to.
 		I offset a given mesh's vertices by a "noise shift" vector representing the amount of skewing caused by
 		transmission noise.
-		To make this look proper from every angle, I decided we should move the geometry to the viewer's left and right.
-		Instead of moving the geometry along the wold space X axis, I used the inverse view matrix to find a point in 3D
-		space to the viewer's left and right of the proper location.
+		To make this shift look proper from every angle, I decided we should move the vertices in the distorted sections
+		of the mesh to the viewer's left and right.
+		This is in contrast to another option: Moving the geometry vertexes along a wold space axis to distort them. To
+		figure out the new,
+		distorted location for a vertex, I used the inverse view matrix to find a point in 3D world
+		space to the viewer's left and right of the vertex's ordinary location.
 	</p>
 	<code class="code-block">
-		vec4 noiseShift = inverseViewMatrix * vec4(wiggleFactor * sin(x / 3.0) * sin(x / 13.0), 0.0, 0.0, 0.0);
-		vec3 shiftedPosition = noiseShift.xyz / 7.0 + position;
-		vec4 mvPosition = modelViewMatrix * vec4(shiftedPosition, 1.0);
+		vec4 noiseShift = inverseViewMatrix * vec4(wiggleFactor * sin(x / 3.0) * sin(x / 13.0), 0.0, 0.0, 0.0);<br>
+		vec3 shiftedPosition = noiseShift.xyz / 7.0 + position;<br>
+		vec4 mvPosition = modelViewMatrix * vec4(shiftedPosition, 1.0);<br>
 		gl_Position = projectionMatrix * mvPosition;
 	</code>
 	<h2><a href="./fun-with-transformations-demo.html">Reflecting an object across a plane</a></h2>
