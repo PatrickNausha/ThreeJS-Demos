@@ -1,29 +1,62 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-		<title>Patrick’s ThreeJS Demos</title>
-		<style>
-			body {
-				font-family: Arial, Helvetica, sans-serif;
-			}
-			canvas {
-				display: block;
-			}
-		</style>
-	</head>
-	<body>
-		<p>For best results, open this page in Google Chrome 99 or newer.</p>
-		<h1>ThreeJS demos</h1>
-		<ul>
-			<li><a href="./reflection-fun.html">Reflection Shader</a></li>
-			<li><a href="./hologram.html">Hologram Shader</a></li>
-			<li><a href="./fun-with-transformations-demo.html">Reflecting an object across a plane</a></li>
-			<li><a href="./shadows.html">Shadows</a></li>
-			<li><a href="./svg.html">SVG</a></li>
-			<li><a href="./confetti-text-glow.html">Confetti, Text, and Glow</a></li>
-			<li><a href="./fun-with-sorting-demo.html">Transparency, depth buffer, and sorting playground</a></li>
-		</ul>
-	</body>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+	<title>Patrick’s ThreeJS Demos</title>
+	<style>
+		body {
+			font-family: Arial, Helvetica, sans-serif;
+		}
+
+		canvas {
+			display: block;
+		}
+	</style>
+</head>
+
+<body>
+	<p>For best results, open this page in Google Chrome 99 or newer.</p>
+	<h1>ThreeJS demos</h1>
+	<p>The following are demo apps I created for the purpose of learning ThreeJS, WebGL, or 3D math.
+	</p>
+	<h2><a href="./hologram.html">Hologram Shader</a></h2>
+	<p>
+		Goal: Implement a shader that can be used to render a <a href="https://starwars.fandom.com/wiki/Hologram">Star Wars</a>-inspired hologram.
+	</p>
+	<p>
+		Why? Learn to write a GLSL shader.
+	</p>
+	<p>
+		What I learned/what was new for me:
+		This was my first time creating my own lighting model. Since a hologram is intentionally not photorealistic, I decided I could use simple <a href="https://en.wikipedia.org/wiki/Lambertian_reflectance#Use_in_computer_graphics">Lambertian reflectance</a>. For this I used a hard-coded light direction and the normal vector from the vertex shader.
+		<code>
+			vec3 lightDirection = normalize(vec3(0.7, 0.5, 1.0));
+			float diffuse = max(dot(vNormal, lightDirection), 0.0);
+		</code>
+		<h4>Converting vectors from screen space to world space.</h4>
+		In Star Wars, holograms have noise (presumably due to poor transmission).
+		These can distort the image dramatically.
+		We want the geometry to occasionally skew and distort in a chaotic way.
+		I offset a given mesh's vertices by a "noise shift" vector representing the amount of skewing caused by transmission noise.
+		To make this look proper from every angle, I decided we should move the geometry to the viewer's left and right.
+		Instead of moving the geometry along the wold space X axis, I used the inverse view matrix to find a point in 3D space to the viewer's left and right of the proper location.
+		<code>
+			vec4 noiseShift = inverseViewMatrix * vec4(wiggleFactor * sin(x / 3.0) * sin(x / 13.0), 0.0, 0.0, 0.0);
+			vec3 shiftedPosition = noiseShift.xyz / 7.0 + position;
+			vec4 mvPosition = modelViewMatrix * vec4(shiftedPosition, 1.0);
+			gl_Position = projectionMatrix * mvPosition;
+		</code>
+	</p>
+	<h2><a href="./reflection-fun.html">Reflection Shader</a></h2>
+
+	<li><a href="./fun-with-transformations-demo.html">Reflecting an object across a plane</a></li>
+	<li><a href="./shadows.html">Shadows</a></li>
+	<li><a href="./svg.html">SVG</a></li>
+	<li><a href="./confetti-text-glow.html">Confetti, Text, and Glow</a></li>
+	<li><a href="./fun-with-sorting-demo.html">Transparency, depth buffer, and sorting playground</a></li>
+	</ul>
+</body>
+
 </html>
