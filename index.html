@@ -102,7 +102,28 @@
 			answer on this StackExchange question</a> may help you understand why.
 	</p>
 
-	<h2><a href="./reflection-fun.html">Reflection Shader</a></h2>
+	<h2><a href="./reflection-fun.html">Blurred Reflection</a></h2>
+	<h3>Goal</h3>
+	<p>Modify the <a
+			href="https://github.com/mrdoob/three.js/blob/34dbd31e519f2b5458ebab2204ccbc0b9d0681e6/examples/jsm/objects/Reflector.js#L1-L261">ThreeJS
+			example reflector</a> to support blurred reflections.</p>
+	<h3>Why?</h3>
+	<p>
+		Learn to apply postprocessing effects to texture render targets.
+		Very few materials, except mirrors, reflect objects perfectly. Blurring a reflection slightly adds a level or
+		realism.</p>
+	<h3>What I learned/what was new for me</h3>
+	<p>
+		I had applied postprocessing effects in ThreeJS before, but those effects were applied to the final buffer
+		rendered to the screen.
+		The new challenge for me here was applying a post-processing effect to a texture render target.
+		Reflected objects are mirrored over the reflective plane and rendered to a texture.
+		I needed to apply my blur filter to that texture.
+		Originally I tried implementing a <a href="https://en.wikipedia.org/wiki/Kernel_(image_processing)">convolution
+			filter</a> in a shader. I later realized I could <a
+			href="https://github.com/PatrickNausha/ThreeJS-Demos/commit/8503f9d181b7063c5eeaf63333c8ed346dc070df">use
+			the existing bloom pass filter ThreeJS has.</a>
+	</p>
 
 	<h2><a href="./shadows.html">Shadows</a></h2>
 	<h2><a href="./svg.html">SVG</a></h2>
