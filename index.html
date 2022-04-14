@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 	<title>Patrick’s ThreeJS Demos</title>
 	<style>
-		.demo:nth-child(even) {
+		.demo:nth-child(odd) {
 			background: #f2f2f2;
 		}
 	</style>
@@ -15,10 +15,21 @@
 </head>
 
 <body>
-	<p>For best results, open the demos in Google Chrome 99 or newer.</p>
-	<h1>Patrick Nausha's ThreeJS demos</h1>
-	<p>The following are demo apps I created for the purpose of learning ThreeJS, WebGL, and 3D math.
-	</p>
+	<div class="container">
+		<p>For best results, open the demos in Google Chrome 99 or newer.</p>
+	</div>
+	<div class="container py-5 my-4">
+		<h1 class="text-center mb-4">Patrick Nausha's ThreeJS Demos</h1>
+		<p class="text-center mb-4">The following are demo apps I created for the purpose of learning ThreeJS, WebGL,
+			and 3D math.</p>
+		<div class="d-flex">
+			<span class="mx-auto">
+				<a class="btn btn-primary btn-md me-3" href="mailto:patrick.nausha@gmail.com">Contact</a>
+				<a class="btn btn-outline-primary btn-md"
+					href="https://github.com/patricknausha/threejs-demos">GitHub</a>
+			</span>
+		</div>
+	</div>
 	<div class="demo py-5">
 		<div class="container">
 			<h2><a href="./hologram.html">Hologram Shader</a></h2>
