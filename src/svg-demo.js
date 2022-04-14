@@ -48,7 +48,6 @@ loader.load(
 
 			const { fill } = path.userData.style;
 			if (fill && fill !== "none") {
-				console.log(shapes.length);
 				for (const shape of shapes) {
 					const extrudeGeometry = new ExtrudeGeometry(shape, {
 						depth: 4,
