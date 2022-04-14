@@ -19,7 +19,7 @@
 		<p>For best results, open the demos in Google Chrome 99 or newer.</p>
 	</div>
 	<div class="container py-5 my-4">
-		<h1 class="text-center mb-4">Patrick Nausha's ThreeJS Demos</h1>
+		<h1 class="text-center mb-4">Patrick Nausha&rsquo;s ThreeJS Demos</h1>
 		<p class="text-center mb-4">The following are demo apps I created for the purpose of learning ThreeJS, WebGL,
 			and 3D math.</p>
 		<div class="d-flex">
@@ -157,11 +157,6 @@
 
 	<div class="demo py-5">
 		<div class="container">
-			<h2><a href="./svg.html">SVG</a></h2>
-		</div>
-	</div>
-	<div class="demo py-5">
-		<div class="container">
 			<h2><a href="./confetti-text-glow.html">Confetti, Text, and Glow</a></h2>
 			<h3>
 				Goal
@@ -175,10 +170,10 @@
 			<p>
 				Solve a real-world problem using ThreeJS.
 			</p>
-			<h3>What I learned/what was new for me</h3>
+			<h4>Background</h4>
 			<p>
-				<a href="https://faithlife.com">My current employer</a> creates <a
-					href="https://faithlife.com/products/proclaim">Proclaim</a>, a church presentation software
+				<a href="https://faithlife.com">My current employer</a>
+				creates <a href="https://faithlife.com/products/proclaim">Proclaim</a>, a church presentation software
 				application
 				and <a href="https://media.faithlife.com/">sells media</a> to be used on-screen in churches,
 				e.g. <a href="https://media.faithlife.com/media/6083-glowing-rain-countdown-3-min">this
@@ -195,6 +190,7 @@
 				browser-based
 				so the WebGL scenes should work for signs as well.
 			</p>
+			<h3>What I learned/what was new for me</h3>
 			<p>
 				Unfortunately it turned out that the cost of creating these 3D dynamic scenes would not be
 				economical for
@@ -248,6 +244,28 @@
 			<p>Note that this strategy is not 100% effective because objects can occlude themselves.</p>
 		</div>
 	</div>
+
+	<div class="demo py-5">
+		<div class="container">
+			<h2><a href="./svg.html">SVG</a></h2>
+			<h3>Goal</h3>
+			<p>Extrude an SVG file into a 3D object.</p>
+			<h3>Why?</h3>
+			<p>
+				Gain familiarity with ThreeJS geometry APIs like <code>ShapeBufferGeometry</code> and
+				<code>ExtrudeGeometry</code>.
+			</p>
+			<p>
+				The SVG was created by my wife who is a graphic designer.
+			</p>
+			<h3>What I learned/what was new for me</h3>
+			<p>
+				When building geometry from scratch, you don't get a lot for "free." <code>ExtrudeGeometry</code> for
+				example doesn't generate normals that result in smooth shading.
+			</p>
+		</div>
+	</div>
+
 	<div class="demo py-5">
 		<div class="container">
 			<h2><a href="./shadows.html">Shadows</a></h2>
