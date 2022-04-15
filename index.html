@@ -110,25 +110,23 @@
 				out how
 				to do this transformation on my own. The "mirror" plane (red) translates and rotates within the 3D
 				world.
-				My solution ended up looking like the following. <code>reflection</code> is the reflected torus knot
-				object.
+				My solution ended up looking like the following (<code>reflection</code> is the reflected torus knot
+				object).
 			</p>
-			<code class="code-block">
-		const reflectionMatrix = new Matrix4()<br>
-		&nbsp;&nbsp;&nbsp;&nbsp;.multiply(planeGroup.matrix) // Convert from plane-local space to world space.<br>
-		&nbsp;&nbsp;&nbsp;&nbsp;.multiply(new Matrix4().makeScale(1, 1, -1)) // Mirror it.<br>
-		&nbsp;&nbsp;&nbsp;&nbsp;.multiply(new Matrix4().getInverse(planeGroup.matrix)) // Convert world space to plane-local space.<br>
-		&nbsp;&nbsp;&nbsp;&nbsp;.multiply(meshMatrixCopy); // Convert mesh-local space to world space.<br>
-		reflection.matrix = reflectionMatrix;
-	</code>
-			<p>In short, I discovered you can solve this problem by converting the mesh's world space coordinates to
-				"mirror
-				space" (a model space that is local to the mirror) and do the Z coordinate flipping (the mirroring
-				operation) in
-				"mirror space" coordinates.
-				Tip: If you're reading about 3D math and some multiplication operations look backwards to you, <a
-					href="https://gamedev.stackexchange.com/questions/133529/difference-between-column-and-row-vector-matrix-multiplication-vector-transfor">the
-					answer on this StackExchange question</a> may help you understand why.
+			<p>
+				<code class="code-block">
+					const reflectionMatrix = new Matrix4()<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;.multiply(planeGroup.matrix) // Convert from plane-local space to world space.<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;.multiply(new Matrix4().makeScale(1, 1, -1)) // Mirror it.<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;.multiply(new Matrix4().getInverse(planeGroup.matrix)) // Convert world space to plane-local space.<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;.multiply(meshMatrixCopy); // Convert mesh-local space to world space.<br>
+					reflection.matrix = reflectionMatrix;
+				</code>
+			</p>
+			<p>
+				In short, I discovered you can solve this problem by converting the mesh's world space coordinates to
+				"mirror space" (a model space that is local to the mirror) and do the Z coordinate flipping (the
+				mirroring operation) in "mirror space" coordinates.
 			</p>
 		</div>
 	</div>
