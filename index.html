@@ -56,12 +56,14 @@
 				vertex
 				shader:
 			</p>
-			<code class="code-block">
-			vec3 lightDirection = normalize(vec3(0.7, 0.5, 1.0));<br>
-			float diffuse = max(dot(vNormal, lightDirection), 0.0);
-		</code>
-			<h4>Converting vectors from screen space to world space.</h4>
 			<p>
+				<code class="code-block">
+					vec3 lightDirection = normalize(vec3(0.7, 0.5, 1.0));<br>
+					float diffuse = max(dot(vNormal, lightDirection), 0.0);
+				</code>
+			</p>
+			<p>
+				I also learned to convert vectors from screen space to world space.
 				In Star Wars, holograms have noise (presumably due to poor transmission).
 				These can distort the image dramatically.
 				We want a hologram's mesh geometry to occasionally skew and distort in a chaotic, but controlled, way.
@@ -72,7 +74,7 @@
 				To make this shift look proper from every angle, I decided we should move the vertices in the distorted
 				sections
 				of the mesh to the viewer's left and right.
-				This is in contrast to another option: Moving the geometry vertexes along a wold space axis to distort
+				This is in contrast to another option: Moving the geometry vertexes along a world space axis, e.g. east-west, to distort
 				them.
 				To
 				figure out the new,
