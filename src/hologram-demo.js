@@ -245,15 +245,18 @@ scanlineFolder.add(scanlineParams, "Intensity", 0, 1).onChange((value) => {
 });
 
 // Main loop
+let hasConfirmedWarning = false;
 function animate(time) {
+	hasConfirmedWarning = hasConfirmedWarning || window.confirm('WARNING. This example may potentially trigger seizures for people with photosensitive epilepsy.');
 	const timeSeconds = time / 1000;
 	uniforms.inverseViewMatrix = { value: camera.matrixWorld };
 	uniforms.time.value = timeSeconds;
 	requestAnimationFrame(animate);
-	composer.render(scene, camera);
+
+	if (hasConfirmedWarning) {
+		composer.render(scene, camera);
+	}
 	updateStats();
 }
 
-if (window.confirm('WARNING. This example may potentially trigger seizures for people with photosensitive epilepsy.')) {
-	animate();
-}
+animate();
