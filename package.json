@@ -3,6 +3,7 @@
 	"version": "0.0.0",
 	"private": true,
 	"author": "PatrickNausha",
+	"browserslist": "> 0.5%, last 2 versions, not dead",
 	"scripts": {
 		"dev": "parcel index.html",
 		"build": "rm -rf ./dist ./.parcel-cache && NODE_ENV=production parcel build index.html --public-url ./",
