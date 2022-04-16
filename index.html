@@ -182,6 +182,44 @@
 
 	<div class="demo py-5">
 		<div class="container">
+			<h2>&ldquo;Barrel&rdquo; Retro Game Asset as glTF</h2>
+			<div class="mb-3"><a class="btn btn-primary btn-md" href="./gltf-barrel-demo.html">View demo</a></div>
+			<img class="my-3" width="340" height="219" src="/static/assets/screenshots/barrel.jpg" />
+			<h3>Goal</h3>
+			<p>Render an asset from a game I created in 2008.</p>
+			<h3>Why?</h3>
+			<p>
+				Learn to render a glTF file in ThreeJS. Learn updated Blender UI.
+			</p>
+			<h4>Background</h4>
+			<p>
+				In high school I created a game using the <a href="https://irrlicht.sourceforge.io/">Irrlicht
+					Engine</a>.
+				I created some of the assets myself in Blender and Photoshop.
+			</p>
+			<h3>Skills and techniques used</h3>
+			<ul>
+				<li>Blender</li>
+				<li>UV mapping</li>
+			</ul>
+			<h3>What I learned/what was new for me</h3>
+			<p>
+				The last time I used Blender was before Blender 2.8. Version 2.8 introduced tabbed workspaces at the top
+				of the user interface.
+				I found this super helpful for switching between tasks like modeling and UV editing.
+				I ended up modifying the asset's UV map before re-exporting it as a <code>.gltf</code> file.
+				The problem with the original asset is the texture was stretched along circumference of the barrel.
+				I changed the UV coordinates to repeat the texture twice in a mirrored fashion around the barrel's
+				circumference.
+				While this adds a repeated pattern around the barrel, it causes more texels to be used per surface area
+				of the barrel.
+				This results in an apparent doubling of image resolution and a higher quality looking texture.
+			</p>
+		</div>
+	</div>
+
+	<div class="demo py-5">
+		<div class="container">
 			<h2>Presentation Title Screen</h2>
 			<div class="mb-3"><a class="btn btn-primary btn-md" href="./confetti-text-glow.html">View demo</a></div>
 			<h3>
@@ -321,43 +359,6 @@
 		</div>
 	</div>
 
-	<div class="demo py-5">
-		<div class="container">
-			<h2>&ldquo;Barrel&rdquo; Retro Game Asset as glTF</h2>
-			<div class="mb-3"><a class="btn btn-primary btn-md" href="./gltf-barrel-demo.html">View demo</a></div>
-			<img class="my-3" width="340" height="219" src="/static/assets/screenshots/barrel.jpg" />
-			<h3>Goal</h3>
-			<p>Render an asset from a game I created in 2008.</p>
-			<h3>Why?</h3>
-			<p>
-				Learn to render a glTF file in ThreeJS. Learn updated Blender UI.
-			</p>
-			<h4>Background</h4>
-			<p>
-				In high school I created a game using the <a href="https://irrlicht.sourceforge.io/">Irrlicht
-					Engine</a>.
-				I created some of the assets myself in Blender and Photoshop.
-			</p>
-			<h3>Skills and techniques used</h3>
-			<ul>
-				<li>Blender</li>
-				<li>UV mapping</li>
-			</ul>
-			<h3>What I learned/what was new for me</h3>
-			<p>
-				The last time I used Blender was before Blender 2.8. Version 2.8 introduced tabbed workspaces at the top
-				of the user interface.
-				I found this super helpful for switching between tasks like modeling and UV editing.
-				I ended up modifying the asset's UV map before re-exporting it as a <code>.gltf</code> file.
-				The problem with the original asset is the texture was stretched along circumference of the barrel.
-				I changed the UV coordinates to repeat the texture twice in a mirrored fashion around the barrel's
-				circumference.
-				While this adds a repeated pattern around the barrel, it causes more texels to be used per surface area
-				of the barrel.
-				This results in an apparent doubling of image resolution and a higher quality looking texture.
-			</p>
-		</div>
-	</div>
 </body>
 
 </html>
