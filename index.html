@@ -148,7 +148,7 @@
 			<img class="mb-3" width="360" height="318" src="/static/assets/screenshots/reflection.gif" />
 			<h3>Goal</h3>
 			<p>Modify the <a
-					href="https://github.com/mrdoob/three.js/blob/34dbd31e519f2b5458ebab2204ccbc0b9d0681e6/examples/jsm/objects/Reflector.js#L1-L261">ThreeJS
+					href="https://github.com/mrdoob/three.js/blob/34dbd31e519f2b5458ebab2204ccbc0b9d0681e6/examples/jsm/objects/Reflector.js">ThreeJS
 					example reflector</a> to support blurred reflections.</p>
 			<h3>Why?</h3>
 			<p>
@@ -156,13 +156,20 @@
 				Very few materials, except mirrors, reflect objects perfectly. Blurring a reflection slightly adds a
 				level of
 				realism.</p>
+			<h3>Skills and techniques used</h3>
+			<ul>
+				<li>Texture render targets</li>
+				<li>Post-processing effects</li>
+				<li>Normal map</li>
+				<li>Repeat texture wrapping</li>
+			</ul>
 			<h3>What I learned/what was new for me</h3>
 			<p>
 				I had applied post-processing effects in ThreeJS before, but those effects were applied to the final
 				buffer
 				rendered to the screen.
-				The new challenge for me here was applying a post-processing effect to a texture render target.
-				Reflected objects are mirrored over the reflective plane and rendered to a texture.
+				The new challenge for me here was applying a post-processing effect to an intermediate texture render target.
+				(Reflected objects are mirrored over the reflective plane and rendered separately to a texture.)
 				I needed to apply my blur filter to that texture.
 				Originally I tried implementing a <a
 					href="https://en.wikipedia.org/wiki/Kernel_(image_processing)">convolution
