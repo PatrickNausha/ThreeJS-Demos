@@ -1,20 +1,6 @@
-import {
-	Scene,
-	PerspectiveCamera,
-	WebGLRenderer,
-	MeshStandardMaterial,
-	Mesh,
-	PointLight,
-	SphereGeometry,
-	AmbientLight,
-	PlaneBufferGeometry,
-	BoxGeometry,
-} from "three";
+import { Scene, WebGLRenderer, Mesh, BoxGeometry, MeshBasicMaterial, OrthographicCamera } from "three";
 import { updateStats, toggleStats } from "./debug-stats";
-import { addLight, setDebugLightsOn } from "./lights";
 import { GUI } from "dat.gui";
-import { OrthographicCamera } from "three";
-import { MeshBasicMaterial } from "three";
 
 const ambientLightColor = 0x111111;
 
@@ -48,12 +34,6 @@ const guiParams = {
 };
 
 const gui = new GUI();
-gui.add(guiParams, "debugLights").onChange((value) => {
-	setDebugLightsOn(value);
-});
-setDebugLightsOn(guiParams.debugLights);
-
-gui.add(guiParams, "animateLights");
 
 // Show stats
 toggleStats();
