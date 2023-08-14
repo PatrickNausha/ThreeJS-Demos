@@ -17,13 +17,9 @@ const camera = new OrthographicCamera(-100, 100, -100, 100);
 const plainMaterial = new MeshBasicMaterial({ color: 0x00ff00 });
 
 // Add models
-const boxes = [];
-for (let x = -10; x <= 10; x += 5) {
-	const box = new Mesh(new BoxGeometry(2, 2, 2), plainMaterial);
-	box.position.set(x, 0, 0);
-	boxes.push(box);
-	scene.add(box);
-}
+
+const spaceCraft = new Mesh(new BoxGeometry(2, 2, 2), plainMaterial);
+scene.add(spaceCraft);
 
 const guiParams = {
 	debugLights: true,
@@ -35,20 +31,36 @@ const guiParams = {
 
 const gui = new GUI();
 
-// Show stats
 toggleStats();
 
+const rotationSpeed = 5.0;
+function step(timestampDifference) {
+	if (keyStates["ArrowLeft"]) {
+		spaceCraft.rotateZ(-timestampDifference * rotationSpeed);
+		console.log("foo");
+	}
+	if (keyStates["ArrowRight"]) {
+		spaceCraft.rotateZ(timestampDifference * rotationSpeed);
+		console.log("bar");
+	}
+}
+
+const keyStates = {};
+window.document.addEventListener("keydown", (event) => {
+	keyStates[event.code] = true;
+});
+window.document.addEventListener("keyup", (event) => {
+	keyStates[event.code] = false;
+});
+
 // Main loop
-function animate() {
+let lastTimestamp;
+function animate(timestamp) {
+	const timestampDifference = timestamp - lastTimestamp;
 	requestAnimationFrame(animate);
-	step();
+	step(timestampDifference / 1000);
 	renderer.render(scene, camera);
 	updateStats();
+	lastTimestamp = timestamp;
 }
 animate();
-
-var lastTime = new Date().getTime();
-function step() {
-	const time = new Date().getTime();
-	lastTime = time;
-}
