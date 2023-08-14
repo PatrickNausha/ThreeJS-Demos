@@ -1,6 +1,8 @@
-import { Scene, WebGLRenderer, Mesh, BoxGeometry, MeshBasicMaterial, OrthographicCamera } from "three";
+import { SphereGeometry, Scene, WebGLRenderer, Mesh, BoxGeometry, MeshBasicMaterial, OrthographicCamera } from "three";
 import { updateStats, toggleStats } from "./debug-stats";
 import { GUI } from "dat.gui";
+import { Vector3 } from "three";
+import { Matrix4 } from "three";
 
 const ambientLightColor = 0x111111;
 
@@ -13,10 +15,9 @@ document.body.appendChild(renderer.domElement);
 const scene = new Scene();
 
 // Camera
-const camera = new OrthographicCamera(-100, 100, -100, 100);
+const camera = new OrthographicCamera(-100, 100, 100, -100);
+camera.position.z = 10;
 const plainMaterial = new MeshBasicMaterial({ color: 0x00ff00 });
-
-// Add models
 
 const spaceCraft = new Mesh(new BoxGeometry(2, 2, 2), plainMaterial);
 scene.add(spaceCraft);
@@ -33,15 +34,34 @@ const gui = new GUI();
 
 toggleStats();
 
-const rotationSpeed = 5.0;
+const bullets = Array.from({ length: 100 }).map(() => ({
+	mesh: new Mesh(new SphereGeometry(1, 20, 20), plainMaterial),
+	velocity: new Vector3(0, 0, 0),
+}));
+for (const bullet of bullets) {
+	scene.add(bullet.mesh);
+}
+
+const shotSpeed = 100.0;
+const rotationSpeed = 3.0;
 function step(timestampDifference) {
 	if (keyStates["ArrowLeft"]) {
-		spaceCraft.rotateZ(-timestampDifference * rotationSpeed);
+		spaceCraft.rotateZ(timestampDifference * rotationSpeed);
 		console.log("foo");
 	}
 	if (keyStates["ArrowRight"]) {
-		spaceCraft.rotateZ(timestampDifference * rotationSpeed);
+		spaceCraft.rotateZ(-timestampDifference * rotationSpeed);
 		console.log("bar");
+	}
+	for (const bullet of bullets) {
+		const bulletPositionDelta = bullet.velocity.clone().multiplyScalar(timestampDifference);
+		bullet.mesh.position.add(bulletPositionDelta);
+	}
+
+	if (keyStates["Space"]) {
+		const velocity = new Vector3(0, shotSpeed, 0);
+		velocity.applyMatrix4(new Matrix4().extractRotation(spaceCraft.matrix));
+		fireBullet(new Vector3(), velocity);
 	}
 }
 
@@ -58,9 +78,27 @@ let lastTimestamp;
 function animate(timestamp) {
 	const timestampDifference = timestamp - lastTimestamp;
 	requestAnimationFrame(animate);
-	step(timestampDifference / 1000);
+	if (lastTimestamp) {
+		step(timestampDifference / 1000);
+	}
 	renderer.render(scene, camera);
 	updateStats();
 	lastTimestamp = timestamp;
 }
 animate();
+
+let nextBulletIndex = 0;
+let isCoolingDown = false;
+function fireBullet(position, velocity) {
+	if (isCoolingDown) {
+		return;
+	}
+	isCoolingDown = true;
+	setTimeout(() => {
+		isCoolingDown = false;
+	}, 250);
+	bullets[nextBulletIndex].position = position;
+	bullets[nextBulletIndex].velocity = velocity;
+
+	nextBulletIndex = (nextBulletIndex + 1) % bullets.length;
+}
