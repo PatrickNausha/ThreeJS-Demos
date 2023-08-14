@@ -34,7 +34,7 @@ const gui = new GUI();
 
 toggleStats();
 
-const bullets = Array.from({ length: 100 }).map(() => ({
+const bullets = Array.from({ length: 10 }).map(() => ({
 	mesh: new Mesh(new SphereGeometry(1, 20, 20), plainMaterial),
 	velocity: new Vector3(0, 0, 0),
 }));
@@ -97,7 +97,7 @@ function fireBullet(position, velocity) {
 	setTimeout(() => {
 		isCoolingDown = false;
 	}, 250);
-	bullets[nextBulletIndex].position = position;
+	bullets[nextBulletIndex].mesh.position.copy(position);
 	bullets[nextBulletIndex].velocity = velocity;
 
 	nextBulletIndex = (nextBulletIndex + 1) % bullets.length;
