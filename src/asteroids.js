@@ -42,20 +42,37 @@ for (const bullet of bullets) {
 	scene.add(bullet.mesh);
 }
 
+const asteroidRadius = 4;
+const asteroidCount = 10;
+const asteroids = Array.from({ length: asteroidCount }).map(() => ({
+	mesh: new Mesh(new SphereGeometry(asteroidRadius, 10, 10), plainMaterial),
+	velocity: new Vector3(0, 0, 0),
+}));
+for (const asteroid of asteroids) {
+	asteroid.mesh.position.set(Math.random() * 200 - 100, Math.random() * 200 - 100, 0);
+	scene.add(asteroid.mesh);
+}
+
 const shotSpeed = 100.0;
 const rotationSpeed = 3.0;
 function step(timestampDifference) {
 	if (keyStates["ArrowLeft"]) {
 		spaceCraft.rotateZ(timestampDifference * rotationSpeed);
-		console.log("foo");
 	}
 	if (keyStates["ArrowRight"]) {
 		spaceCraft.rotateZ(-timestampDifference * rotationSpeed);
-		console.log("bar");
 	}
+
 	for (const bullet of bullets) {
+		// Move bullets
 		const bulletPositionDelta = bullet.velocity.clone().multiplyScalar(timestampDifference);
 		bullet.mesh.position.add(bulletPositionDelta);
+
+		// Detect collisions
+		const collisions = detectBulletCollisions(bullet, asteroids);
+		for (const collision of collisions) {
+			scene.remove(collision.mesh);
+		}
 	}
 
 	if (keyStates["Space"]) {
@@ -63,6 +80,16 @@ function step(timestampDifference) {
 		velocity.applyMatrix4(new Matrix4().extractRotation(spaceCraft.matrix));
 		fireBullet(new Vector3(), velocity);
 	}
+}
+
+function detectBulletCollisions(bullet, collidables) {
+	const collisions = [];
+	for (const collidable of collidables) {
+		if (bullet.mesh.position.distanceTo(collidable.mesh.position) < asteroidRadius) {
+			collisions.push(collidable);
+		}
+	}
+	return collisions;
 }
 
 const keyStates = {};
