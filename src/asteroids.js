@@ -1,5 +1,14 @@
-import { SphereGeometry, Scene, WebGLRenderer, Mesh, BoxGeometry, MeshBasicMaterial, OrthographicCamera } from "three";
+import {
+	SphereGeometry,
+	Scene,
+	WebGLRenderer,
+	Mesh,
+	MeshBasicMaterial,
+	OrthographicCamera,
+	DirectionalLight,
+} from "three";
 import { updateStats, toggleStats } from "./debug-stats";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { GUI } from "dat.gui";
 import { Vector3 } from "three";
 import { Matrix4 } from "three";
@@ -19,18 +28,33 @@ const camera = new OrthographicCamera(-100, 100, 100, -100);
 camera.position.z = 10;
 const plainMaterial = new MeshBasicMaterial({ color: 0x00ff00 });
 
-const spaceCraft = new Mesh(new BoxGeometry(2, 2, 2), plainMaterial);
-scene.add(spaceCraft);
+let spaceCraft = null;
+
+const loader = new GLTFLoader().setPath("./assets/models/");
+loader.load("asteroids-spacecraft.gltf", function (gltf) {
+	spaceCraft = gltf.scene;
+	scene.add(spaceCraft);
+});
 
 const guiParams = {
 	debugLights: true,
 	light0: true,
 	light1: true,
+	light2: true,
 	animateLights: true,
 	model: "sphere",
 };
 
 const gui = new GUI();
+gui.add(guiParams, "light0").onChange((value) => {
+	whiteLight.visible = value;
+});
+gui.add(guiParams, "light1").onChange((value) => {
+	blueLight.visible = value;
+});
+gui.add(guiParams, "light2").onChange((value) => {
+	orangeLight.visible = value;
+});
 
 toggleStats();
 
@@ -78,7 +102,7 @@ function step(timestampDifference) {
 	if (keyStates["Space"]) {
 		const velocity = new Vector3(0, shotSpeed, 0);
 		velocity.applyMatrix4(new Matrix4().extractRotation(spaceCraft.matrix));
-		fireBullet(new Vector3(), velocity);
+		fireBullet(new Vector3(0, 0, -1), velocity);
 	}
 }
 
@@ -100,11 +124,28 @@ window.document.addEventListener("keyup", (event) => {
 	keyStates[event.code] = false;
 });
 
+const whiteLight = new DirectionalLight(0xffffff, 1);
+whiteLight.position.set(1, 1, 2);
+scene.add(whiteLight);
+
+const orangeLight = new DirectionalLight(0xff7700, 0.5);
+orangeLight.position.set(1, -2, 0.5);
+scene.add(orangeLight);
+
+const blueLight = new DirectionalLight(0x0077ff, 0.5);
+blueLight.position.set(-1, 1, 0.5);
+scene.add(blueLight);
+
 // Main loop
 let lastTimestamp;
 function animate(timestamp) {
 	const timestampDifference = timestamp - lastTimestamp;
 	requestAnimationFrame(animate);
+	if (!spaceCraft) {
+		// Wait for assets to load.
+		return;
+	}
+
 	if (lastTimestamp) {
 		step(timestampDifference / 1000);
 	}
