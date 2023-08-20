@@ -3,9 +3,10 @@ import {
 	Scene,
 	WebGLRenderer,
 	Mesh,
-	MeshBasicMaterial,
+	MeshStandardMaterial,
 	OrthographicCamera,
 	DirectionalLight,
+	MeshBasicMaterial,
 } from "three";
 import { updateStats, toggleStats } from "./debug-stats";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -26,7 +27,6 @@ const scene = new Scene();
 // Camera
 const camera = new OrthographicCamera(-100, 100, 100, -100);
 camera.position.z = 10;
-const plainMaterial = new MeshBasicMaterial({ color: 0x00ff00 });
 
 let spaceCraft = null;
 
@@ -58,18 +58,22 @@ gui.add(guiParams, "light2").onChange((value) => {
 
 toggleStats();
 
+const laserGeometry = new SphereGeometry(1, 5, 5);
+const laserMaterial = new MeshBasicMaterial({ color: 0x00ff00 });
 const bullets = Array.from({ length: 10 }).map(() => ({
-	mesh: new Mesh(new SphereGeometry(1, 20, 20), plainMaterial),
+	mesh: new Mesh(laserGeometry, laserMaterial),
 	velocity: new Vector3(0, 0, 0),
 }));
 for (const bullet of bullets) {
 	scene.add(bullet.mesh);
 }
 
-const asteroidRadius = 4;
-const asteroidCount = 10;
+const asteroidRadius = 10;
+const asteroidCount = 5;
+const asteroidMaterial = new MeshStandardMaterial({ color: 0xb07e41 });
+const asteroidGeometry = new SphereGeometry(asteroidRadius, 10, 10);
 const asteroids = Array.from({ length: asteroidCount }).map(() => ({
-	mesh: new Mesh(new SphereGeometry(asteroidRadius, 10, 10), plainMaterial),
+	mesh: new Mesh(asteroidGeometry, asteroidMaterial),
 	velocity: new Vector3(0, 0, 0),
 }));
 for (const asteroid of asteroids) {
@@ -100,9 +104,11 @@ function step(timestampDifference) {
 	}
 
 	if (keyStates["Space"]) {
+		const position = new Vector3(0, 5, -1);
 		const velocity = new Vector3(0, shotSpeed, 0);
 		velocity.applyMatrix4(new Matrix4().extractRotation(spaceCraft.matrix));
-		fireBullet(new Vector3(0, 0, -1), velocity);
+		position.applyMatrix4(spaceCraft.matrix);
+		fireBullet(position, velocity);
 	}
 }
 
@@ -132,7 +138,7 @@ const orangeLight = new DirectionalLight(0xff7700, 0.5);
 orangeLight.position.set(1, -2, 0.5);
 scene.add(orangeLight);
 
-const blueLight = new DirectionalLight(0x0077ff, 0.5);
+const blueLight = new DirectionalLight(0x0077ff, 0.7);
 blueLight.position.set(-1, 1, 0.5);
 scene.add(blueLight);
 
