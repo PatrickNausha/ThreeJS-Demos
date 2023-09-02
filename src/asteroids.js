@@ -6,6 +6,7 @@ import {
 	OrthographicCamera,
 	DirectionalLight,
 	MeshBasicMaterial,
+	sRGBEncoding,
 } from "three";
 import { updateStats, toggleStats } from "./debug-stats";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -17,6 +18,7 @@ const ambientLightColor = 0x111111;
 const aspectRatio = 4 / 3;
 
 const renderer = new WebGLRenderer({ antialias: true });
+renderer.outputEncoding = sRGBEncoding;
 renderer.setClearColor(ambientLightColor);
 renderer.setPixelRatio(window.devicePixelRatio || 1);
 document.body.appendChild(renderer.domElement);
@@ -24,12 +26,13 @@ document.body.appendChild(renderer.domElement);
 const scene = new Scene();
 
 // Camera
-const viewportHeightMeters = 160;
+const viewportHeightMeters = 320;
+const viewportWidthMeters = aspectRatio * viewportHeightMeters;
 const camera = new OrthographicCamera(
-	aspectRatio * -viewportHeightMeters,
-	aspectRatio * viewportHeightMeters,
-	viewportHeightMeters,
-	-viewportHeightMeters
+	-viewportWidthMeters / 2,
+	viewportWidthMeters / 2,
+	viewportHeightMeters / 2,
+	-viewportHeightMeters / 2
 );
 camera.position.z = 100;
 
@@ -100,7 +103,11 @@ function placeAsteroids(asteroidGltf) {
 		};
 	});
 	for (const asteroid of asteroids) {
-		asteroid.mesh.position.set(Math.random() * 200 - 100, Math.random() * 200 - 100, 0);
+		asteroid.mesh.position.set(
+			Math.random() * viewportWidthMeters - viewportWidthMeters / 2,
+			Math.random() * viewportHeightMeters - viewportHeightMeters / 2,
+			0
+		);
 		scene.add(asteroid.mesh);
 	}
 	return asteroids;
@@ -169,7 +176,7 @@ const orangeLight = new DirectionalLight(0xff7700, 0.5);
 orangeLight.position.set(1, -2, 0.5);
 scene.add(orangeLight);
 
-const blueLight = new DirectionalLight(0x0077ff, 0.7);
+const blueLight = new DirectionalLight(0x0077ff, 0.5);
 blueLight.position.set(-1, 1, 0.5);
 scene.add(blueLight);
 
