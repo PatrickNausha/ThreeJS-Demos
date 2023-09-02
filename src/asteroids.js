@@ -18,22 +18,27 @@ const ambientLightColor = 0x111111;
 
 const renderer = new WebGLRenderer({ antialias: true });
 renderer.setClearColor(ambientLightColor);
-renderer.setSize(700, 700);
 renderer.setPixelRatio(window.devicePixelRatio || 1);
 document.body.appendChild(renderer.domElement);
 
 const scene = new Scene();
 
 // Camera
-const camera = new OrthographicCamera(-100, 100, 100, -100);
+const camera = new OrthographicCamera(-266, 266, 200, -200);
 camera.position.z = 10;
 
 let spaceCraft = null;
+let asteroid1 = null;
 
 const loader = new GLTFLoader().setPath("./assets/models/");
 loader.load("asteroids-spacecraft.gltf", function (gltf) {
 	spaceCraft = gltf.scene;
 	scene.add(spaceCraft);
+});
+loader.load("asteroids-rock-1.gltf", function (gltf) {
+	asteroid1 = gltf.scene;
+	asteroid1.position.set(10, 10, -10);
+	scene.add(asteroid1);
 });
 
 const guiParams = {
@@ -176,3 +181,14 @@ function fireBullet(position, velocity) {
 
 	nextBulletIndex = (nextBulletIndex + 1) % bullets.length;
 }
+
+function resizeWindow() {
+	const aspectRatio = 4 / 3;
+	const height = window.innerHeight;
+	const width = window.innerHeight * aspectRatio;
+	renderer.setSize(width, height);
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+}
+resizeWindow();
+window.addEventListener("resize", resizeWindow);
