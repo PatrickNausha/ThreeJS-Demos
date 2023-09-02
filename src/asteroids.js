@@ -14,6 +14,7 @@ import { Vector3 } from "three";
 import { Matrix4 } from "three";
 
 const ambientLightColor = 0x111111;
+const aspectRatio = 4 / 3;
 
 const renderer = new WebGLRenderer({ antialias: true });
 renderer.setClearColor(ambientLightColor);
@@ -23,7 +24,13 @@ document.body.appendChild(renderer.domElement);
 const scene = new Scene();
 
 // Camera
-const camera = new OrthographicCamera(-266, 266, 200, -200);
+const viewportHeightMeters = 160;
+const camera = new OrthographicCamera(
+	aspectRatio * -viewportHeightMeters,
+	aspectRatio * viewportHeightMeters,
+	viewportHeightMeters,
+	-viewportHeightMeters
+);
 camera.position.z = 100;
 
 const loader = new GLTFLoader().setPath("./assets/models/");
@@ -86,7 +93,11 @@ function placeAsteroids(asteroidGltf) {
 	const asteroidCount = 5;
 	const asteroids = Array.from({ length: asteroidCount }).map(() => {
 		const asteroidMeshCopy = asteroidGltf.scene.children[0].clone();
-		return { mesh: asteroidMeshCopy, velocity: new Vector3(0, 0, 0) };
+		return {
+			mesh: asteroidMeshCopy,
+			velocity: new Vector3(0, 0, 0),
+			angularVelocity: new Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1),
+		};
 	});
 	for (const asteroid of asteroids) {
 		asteroid.mesh.position.set(Math.random() * 200 - 100, Math.random() * 200 - 100, 0);
@@ -103,6 +114,12 @@ function step(timestampDifference) {
 	}
 	if (keyStates["ArrowRight"]) {
 		spaceCraft.rotateZ(-timestampDifference * rotationSpeed);
+	}
+
+	for (const asteroid of asteroids) {
+		asteroid.mesh.rotateZ(timestampDifference * asteroid.angularVelocity.x);
+		asteroid.mesh.rotateY(timestampDifference * asteroid.angularVelocity.y);
+		asteroid.mesh.rotateZ(timestampDifference * asteroid.angularVelocity.z);
 	}
 
 	for (const bullet of bullets) {
@@ -161,7 +178,7 @@ let lastTimestamp;
 function animate(timestamp) {
 	const timestampDifference = timestamp - lastTimestamp;
 	requestAnimationFrame(animate);
-	if (!spaceCraft) {
+	if (!spaceCraft || !asteroids) {
 		// Wait for assets to load.
 		return;
 	}
@@ -192,7 +209,6 @@ function fireBullet(position, velocity) {
 }
 
 function resizeWindow() {
-	const aspectRatio = 4 / 3;
 	const height = window.innerHeight;
 	const width = window.innerHeight * aspectRatio;
 	renderer.setSize(width, height);
