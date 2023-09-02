@@ -3,7 +3,6 @@ import {
 	Scene,
 	WebGLRenderer,
 	Mesh,
-	MeshStandardMaterial,
 	OrthographicCamera,
 	DirectionalLight,
 	MeshBasicMaterial,
@@ -25,21 +24,30 @@ const scene = new Scene();
 
 // Camera
 const camera = new OrthographicCamera(-266, 266, 200, -200);
-camera.position.z = 10;
-
-let spaceCraft = null;
-let asteroid1 = null;
+camera.position.z = 100;
 
 const loader = new GLTFLoader().setPath("./assets/models/");
-loader.load("asteroids-spacecraft.gltf", function (gltf) {
-	spaceCraft = gltf.scene;
+function promisifiedGltfLoad(path) {
+	return new Promise((resolve, reject) => {
+		loader.load(path, function (gltf) {
+			resolve(gltf);
+		});
+	});
+}
+
+let spaceCraft = null;
+let asteroids = null;
+(async function load() {
+	const [spaceCraftGltf, rockGltf] = await Promise.all([
+		promisifiedGltfLoad("asteroids-spacecraft.gltf"),
+		promisifiedGltfLoad("asteroids-rock-1.gltf"),
+	]);
+
+	spaceCraft = spaceCraftGltf.scene;
 	scene.add(spaceCraft);
-});
-loader.load("asteroids-rock-1.gltf", function (gltf) {
-	asteroid1 = gltf.scene;
-	asteroid1.position.set(10, 10, -10);
-	scene.add(asteroid1);
-});
+
+	asteroids = placeAsteroids(rockGltf);
+})();
 
 const guiParams = {
 	debugLights: true,
@@ -74,16 +82,17 @@ for (const bullet of bullets) {
 }
 
 const asteroidRadius = 10;
-const asteroidCount = 5;
-const asteroidMaterial = new MeshStandardMaterial({ color: 0xb07e41 });
-const asteroidGeometry = new SphereGeometry(asteroidRadius, 10, 10);
-const asteroids = Array.from({ length: asteroidCount }).map(() => ({
-	mesh: new Mesh(asteroidGeometry, asteroidMaterial),
-	velocity: new Vector3(0, 0, 0),
-}));
-for (const asteroid of asteroids) {
-	asteroid.mesh.position.set(Math.random() * 200 - 100, Math.random() * 200 - 100, 0);
-	scene.add(asteroid.mesh);
+function placeAsteroids(asteroidGltf) {
+	const asteroidCount = 5;
+	const asteroids = Array.from({ length: asteroidCount }).map(() => {
+		const asteroidMeshCopy = asteroidGltf.scene.children[0].clone();
+		return { mesh: asteroidMeshCopy, velocity: new Vector3(0, 0, 0) };
+	});
+	for (const asteroid of asteroids) {
+		asteroid.mesh.position.set(Math.random() * 200 - 100, Math.random() * 200 - 100, 0);
+		scene.add(asteroid.mesh);
+	}
+	return asteroids;
 }
 
 const shotSpeed = 100.0;
