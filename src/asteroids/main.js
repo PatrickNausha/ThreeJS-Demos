@@ -87,12 +87,10 @@ toggleStats();
 
 const laserGeometry = new SphereGeometry(1, 5, 5);
 const laserMaterial = new MeshBasicMaterial({ color: 0x00ff00 });
-const bullets = Array.from({ length: 10 }).map(() => ({
-	mesh: new Mesh(laserGeometry, laserMaterial),
-	velocity: new Vector3(0, 0, 0),
-}));
+const bullets = Array.from({ length: 10 }).map(() => new Mesh(laserGeometry, laserMaterial));
 for (const bullet of bullets) {
-	scene.add(bullet.mesh);
+	scene.add(bullet);
+	movables.add(bullet, new Vector3(0, 0, 0), new Vector3(0, 0, 0));
 }
 
 const shotSpeed = 100.0;
@@ -106,26 +104,22 @@ function step(timestampDifference) {
 		movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, 0));
 	}
 
-	movables.step(timestampDifference);
-
-	for (const bullet of bullets) {
-		// Move bullets
-		const bulletPositionDelta = bullet.velocity.clone().multiplyScalar(timestampDifference);
-		bullet.mesh.position.add(bulletPositionDelta);
-
-		// Detect collisions
-		const asteroidCollisions = detectBulletCollisions(bullet.mesh.position);
-		for (const asteroid of asteroidCollisions) {
-			explodeAsteroid(asteroid);
-		}
-	}
-
 	if (keyStates["Space"]) {
 		const position = new Vector3(0, 5, -1);
 		const velocity = new Vector3(0, shotSpeed, 0);
 		velocity.applyMatrix4(new Matrix4().extractRotation(spaceCraft.matrix));
 		position.applyMatrix4(spaceCraft.matrix);
 		fireBullet(position, velocity);
+	}
+
+	movables.step(timestampDifference);
+
+	for (const bullet of bullets) {
+		// Detect collisions
+		const asteroidCollisions = detectBulletCollisions(bullet.position);
+		for (const asteroid of asteroidCollisions) {
+			explodeAsteroid(asteroid);
+		}
 	}
 }
 
@@ -178,8 +172,8 @@ function fireBullet(position, velocity) {
 	setTimeout(() => {
 		isCoolingDown = false;
 	}, 250);
-	bullets[nextBulletIndex].mesh.position.copy(position);
-	bullets[nextBulletIndex].velocity = velocity;
+	bullets[nextBulletIndex].position.copy(position);
+	movables.setVelocity(bullets[nextBulletIndex], velocity);
 
 	nextBulletIndex = (nextBulletIndex + 1) % bullets.length;
 }

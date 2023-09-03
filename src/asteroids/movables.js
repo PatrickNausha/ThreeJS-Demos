@@ -23,11 +23,23 @@ export class Movables {
 		this.#movables.set(object3d, { velocity: movable.velocity, angularVelocity });
 	}
 
+	setVelocity(object3d, velocity) {
+		const movable = this.#movables.get(object3d);
+		if (!movable) {
+			console.error("Unknown object", object3d);
+			throw new Error("Unknown object");
+		}
+		this.#movables.set(object3d, { velocity, angularVelocity: movable.angularVelocity });
+	}
+
 	step(timestampDifference) {
 		for (const [object3d, { velocity, angularVelocity }] of this.#movables) {
 			object3d.rotateX(timestampDifference * angularVelocity.x);
 			object3d.rotateY(timestampDifference * angularVelocity.y);
 			object3d.rotateZ(timestampDifference * angularVelocity.z);
+
+			const positionDelta = velocity.clone().multiplyScalar(timestampDifference);
+			object3d.position.add(positionDelta);
 		}
 	}
 }
