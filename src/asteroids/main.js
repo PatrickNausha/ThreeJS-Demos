@@ -99,10 +99,11 @@ const shotSpeed = 100.0;
 const rotationSpeed = 3.0;
 function step(timestampDifference) {
 	if (keyStates["ArrowLeft"]) {
-		spaceCraft.rotateZ(timestampDifference * rotationSpeed);
-	}
-	if (keyStates["ArrowRight"]) {
-		spaceCraft.rotateZ(-timestampDifference * rotationSpeed);
+		movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, rotationSpeed));
+	} else if (keyStates["ArrowRight"]) {
+		movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, -rotationSpeed));
+	} else {
+		movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, 0));
 	}
 
 	movables.step(timestampDifference);
