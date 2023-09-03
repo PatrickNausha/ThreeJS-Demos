@@ -28,6 +28,10 @@ export function resetAsteroids(gameAreaWidthMeters, gameAreaHeightMeters) {
 	}
 }
 
+export function explodeAsteroid(asteroid) {
+	asteroid.visible = false;
+}
+
 export function detectBulletCollisions(bulletPosition) {
 	const collisions = [];
 	for (const asteroid of asteroids) {

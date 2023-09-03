@@ -14,7 +14,7 @@ import { GUI } from "dat.gui";
 import { Vector3 } from "three";
 import { Matrix4 } from "three";
 import { Movables } from "./movables";
-import { createAsteroids, resetAsteroids, detectBulletCollisions } from "./asteroids";
+import { createAsteroids, resetAsteroids, detectBulletCollisions, explodeAsteroid } from "./asteroids";
 
 const ambientLightColor = 0x111111;
 const aspectRatio = 4 / 3;
@@ -114,9 +114,9 @@ function step(timestampDifference) {
 		bullet.mesh.position.add(bulletPositionDelta);
 
 		// Detect collisions
-		const collisions = detectBulletCollisions(bullet.mesh.position);
-		for (const collision of collisions) {
-			scene.remove(collision);
+		const asteroidCollisions = detectBulletCollisions(bullet.mesh.position);
+		for (const asteroid of asteroidCollisions) {
+			explodeAsteroid(asteroid);
 		}
 	}
 
