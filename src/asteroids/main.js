@@ -8,11 +8,13 @@ import {
 	MeshBasicMaterial,
 	sRGBEncoding,
 } from "three";
-import { updateStats, toggleStats } from "./debug-stats";
+import { updateStats, toggleStats } from "../debug-stats";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { GUI } from "dat.gui";
 import { Vector3 } from "three";
 import { Matrix4 } from "three";
+import { Movables } from "./movables";
+import { createAsteroids, resetAsteroids, detectBulletCollisions } from "./asteroids";
 
 const ambientLightColor = 0x111111;
 const aspectRatio = 4 / 3;
@@ -24,6 +26,7 @@ renderer.setPixelRatio(window.devicePixelRatio || 1);
 document.body.appendChild(renderer.domElement);
 
 const scene = new Scene();
+const movables = new Movables();
 
 // Camera
 const viewportHeightMeters = 320;
@@ -46,7 +49,6 @@ function promisifiedGltfLoad(path) {
 }
 
 let spaceCraft = null;
-let asteroids = null;
 (async function load() {
 	const [spaceCraftGltf, rockGltf] = await Promise.all([
 		promisifiedGltfLoad("asteroids-spacecraft.gltf"),
@@ -55,8 +57,10 @@ let asteroids = null;
 
 	spaceCraft = spaceCraftGltf.scene;
 	scene.add(spaceCraft);
+	movables.add(spaceCraft, new Vector3(0, 0, 0), new Vector3(0, 0, 0));
 
-	asteroids = placeAsteroids(rockGltf);
+	createAsteroids(rockGltf, movables, scene);
+	resetAsteroids(viewportWidthMeters, viewportHeightMeters);
 })();
 
 const guiParams = {
@@ -91,28 +95,6 @@ for (const bullet of bullets) {
 	scene.add(bullet.mesh);
 }
 
-const asteroidRadius = 10;
-function placeAsteroids(asteroidGltf) {
-	const asteroidCount = 5;
-	const asteroids = Array.from({ length: asteroidCount }).map(() => {
-		const asteroidMeshCopy = asteroidGltf.scene.children[0].clone();
-		return {
-			mesh: asteroidMeshCopy,
-			velocity: new Vector3(0, 0, 0),
-			angularVelocity: new Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1),
-		};
-	});
-	for (const asteroid of asteroids) {
-		asteroid.mesh.position.set(
-			Math.random() * viewportWidthMeters - viewportWidthMeters / 2,
-			Math.random() * viewportHeightMeters - viewportHeightMeters / 2,
-			0
-		);
-		scene.add(asteroid.mesh);
-	}
-	return asteroids;
-}
-
 const shotSpeed = 100.0;
 const rotationSpeed = 3.0;
 function step(timestampDifference) {
@@ -123,11 +105,7 @@ function step(timestampDifference) {
 		spaceCraft.rotateZ(-timestampDifference * rotationSpeed);
 	}
 
-	for (const asteroid of asteroids) {
-		asteroid.mesh.rotateZ(timestampDifference * asteroid.angularVelocity.x);
-		asteroid.mesh.rotateY(timestampDifference * asteroid.angularVelocity.y);
-		asteroid.mesh.rotateZ(timestampDifference * asteroid.angularVelocity.z);
-	}
+	movables.step(timestampDifference);
 
 	for (const bullet of bullets) {
 		// Move bullets
@@ -135,9 +113,9 @@ function step(timestampDifference) {
 		bullet.mesh.position.add(bulletPositionDelta);
 
 		// Detect collisions
-		const collisions = detectBulletCollisions(bullet, asteroids);
+		const collisions = detectBulletCollisions(bullet.mesh.position);
 		for (const collision of collisions) {
-			scene.remove(collision.mesh);
+			scene.remove(collision);
 		}
 	}
 
@@ -148,16 +126,6 @@ function step(timestampDifference) {
 		position.applyMatrix4(spaceCraft.matrix);
 		fireBullet(position, velocity);
 	}
-}
-
-function detectBulletCollisions(bullet, collidables) {
-	const collisions = [];
-	for (const collidable of collidables) {
-		if (bullet.mesh.position.distanceTo(collidable.mesh.position) < asteroidRadius) {
-			collisions.push(collidable);
-		}
-	}
-	return collisions;
 }
 
 const keyStates = {};
@@ -185,7 +153,7 @@ let lastTimestamp;
 function animate(timestamp) {
 	const timestampDifference = timestamp - lastTimestamp;
 	requestAnimationFrame(animate);
-	if (!spaceCraft || !asteroids) {
+	if (!spaceCraft) {
 		// Wait for assets to load.
 		return;
 	}
