@@ -10,11 +10,19 @@ const asteroidRadius = 10;
 let asteroids = [];
 
 let currentSmallAsteroid = 0;
+let largeAsteroids = [];
 let smallAsteroids = [];
 export function createAsteroids(asteroidGltf, movables, scene) {
-	const asteroidCount = 15;
-	asteroids = Array.from({ length: asteroidCount }).map(() => {
-		const asteroidMeshCopy = asteroidGltf.scene.children[0].clone();
+	const largeAsteroidCount = 7;
+	const smallAsteroidCount = largeAsteroidCount * 2;
+	const largeAsteroidMeshes = asteroidGltf.scene.children.filter(({ userData }) =>
+		userData.name.startsWith("asteroid-large-")
+	);
+	const smallAsteroidMeshes = asteroidGltf.scene.children.filter(({ userData }) =>
+		userData.name.startsWith("asteroid-small-")
+	);
+	largeAsteroids = Array.from({ length: largeAsteroidCount }).map((_, index) => {
+		const asteroidMeshCopy = largeAsteroidMeshes[index % largeAsteroidMeshes.length].clone();
 
 		scene.add(asteroidMeshCopy);
 		movables.add(
@@ -24,10 +32,15 @@ export function createAsteroids(asteroidGltf, movables, scene) {
 		);
 		return asteroidMeshCopy;
 	});
-	smallAsteroids = asteroids.slice(-5);
-	for (const smallAsteroid of smallAsteroids) {
-		smallAsteroid.visible = false;
-	}
+	smallAsteroids = Array.from({ length: smallAsteroidCount }).map((_, index) => {
+		const asteroidMeshCopy = smallAsteroidMeshes[index % smallAsteroidMeshes.length].clone();
+
+		scene.add(asteroidMeshCopy);
+		asteroidMeshCopy.visible = false;
+		movables.add(asteroidMeshCopy, new Vector3(0, 0, 0), new Vector3(0, 0, 0));
+		return asteroidMeshCopy;
+	});
+	asteroids = [...smallAsteroids, ...largeAsteroids];
 }
 
 export function resetAsteroids(gameAreaWidthMeters, gameAreaHeightMeters) {

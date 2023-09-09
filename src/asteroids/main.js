@@ -52,7 +52,7 @@ let spaceCraft = null;
 (async function load() {
 	const [spaceCraftGltf, rockGltf] = await Promise.all([
 		promisifiedGltfLoad("asteroids-spacecraft.gltf"),
-		promisifiedGltfLoad("asteroids-rock-1.gltf"),
+		promisifiedGltfLoad("asteroids-scene.gltf"),
 	]);
 
 	spaceCraft = spaceCraftGltf.scene;
