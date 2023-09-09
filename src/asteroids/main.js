@@ -93,7 +93,8 @@ for (const bullet of bullets) {
 	movables.add(bullet, new Vector3(0, 0, 0), new Vector3(0, 0, 0));
 }
 
-const shotSpeed = 100.0;
+const timeForBulletToTravelScreenVertically = 1.5; // seconds
+const shotSpeed = viewportHeightMeters / timeForBulletToTravelScreenVertically;
 const rotationSpeed = 3.0;
 function step(timestampDifference) {
 	if (keyStates["ArrowLeft"]) {
