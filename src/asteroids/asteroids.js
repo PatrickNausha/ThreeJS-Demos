@@ -28,7 +28,8 @@ export function createAsteroids(asteroidGltf, movables, scene) {
 		movables.add(
 			asteroidMeshCopy,
 			new Vector3(0, 0, 0),
-			new Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
+			new Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1),
+			true
 		);
 		return asteroidMeshCopy;
 	});
@@ -40,7 +41,8 @@ export function createAsteroids(asteroidGltf, movables, scene) {
 		movables.add(
 			asteroidMeshCopy,
 			new Vector3(0, 0, 0),
-			new Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
+			new Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1),
+			true
 		);
 		return asteroidMeshCopy;
 	});

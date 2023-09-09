@@ -1,7 +1,7 @@
 export class Movables {
 	#movables = new Map();
 
-	add(object3d, velocity, angularVelocity) {
+	add(object3d, velocity, angularVelocity, shouldWrap = false) {
 		if (!object3d) {
 			throw new Error("object3d parameter is required");
 		}
@@ -11,7 +11,7 @@ export class Movables {
 		if (!angularVelocity) {
 			throw new Error("angularVelocity parameter is required");
 		}
-		this.#movables.set(object3d, { velocity, angularVelocity });
+		this.#movables.set(object3d, { velocity, angularVelocity, shouldWrap });
 	}
 
 	setAngularVelocity(object3d, angularVelocity) {
@@ -20,7 +20,7 @@ export class Movables {
 			console.error("Unknown object", object3d);
 			throw new Error("Unknown object");
 		}
-		this.#movables.set(object3d, { velocity: movable.velocity, angularVelocity });
+		this.#movables.set(object3d, { ...movable, angularVelocity });
 	}
 
 	setVelocity(object3d, velocity) {
@@ -29,12 +29,12 @@ export class Movables {
 			console.error("Unknown object", object3d);
 			throw new Error("Unknown object");
 		}
-		this.#movables.set(object3d, { velocity, angularVelocity: movable.angularVelocity });
+		this.#movables.set(object3d, { ...movable, velocity });
 	}
 
 	step(timestampDifference, areaBounds) {
 		const { top, bottom, left, right } = areaBounds;
-		for (const [object3d, { velocity, angularVelocity }] of this.#movables) {
+		for (const [object3d, { velocity, angularVelocity, shouldWrap }] of this.#movables) {
 			object3d.rotateX(timestampDifference * angularVelocity.x);
 			object3d.rotateY(timestampDifference * angularVelocity.y);
 			object3d.rotateZ(timestampDifference * angularVelocity.z);
@@ -42,14 +42,16 @@ export class Movables {
 			const positionDelta = velocity.clone().multiplyScalar(timestampDifference);
 			object3d.position.add(positionDelta);
 
-			if (object3d.position.x > right) {
-				object3d.position.setX(left);
-			} else if (object3d.position.x < left) {
-				object3d.position.setX(right);
-			} else if (object3d.position.y > top) {
-				object3d.position.setY(bottom);
-			} else if (object3d.position.y < bottom) {
-				object3d.position.setY(top);
+			if (shouldWrap) {
+				if (object3d.position.x > right) {
+					object3d.position.setX(left);
+				} else if (object3d.position.x < left) {
+					object3d.position.setX(right);
+				} else if (object3d.position.y > top) {
+					object3d.position.setY(bottom);
+				} else if (object3d.position.y < bottom) {
+					object3d.position.setY(top);
+				}
 			}
 		}
 	}
