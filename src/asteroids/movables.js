@@ -32,7 +32,8 @@ export class Movables {
 		this.#movables.set(object3d, { velocity, angularVelocity: movable.angularVelocity });
 	}
 
-	step(timestampDifference) {
+	step(timestampDifference, areaBounds) {
+		const { top, bottom, left, right } = areaBounds;
 		for (const [object3d, { velocity, angularVelocity }] of this.#movables) {
 			object3d.rotateX(timestampDifference * angularVelocity.x);
 			object3d.rotateY(timestampDifference * angularVelocity.y);
@@ -40,6 +41,16 @@ export class Movables {
 
 			const positionDelta = velocity.clone().multiplyScalar(timestampDifference);
 			object3d.position.add(positionDelta);
+
+			if (object3d.position.x > right) {
+				object3d.position.setX(left);
+			} else if (object3d.position.x < left) {
+				object3d.position.setX(right);
+			} else if (object3d.position.y > top) {
+				object3d.position.setY(bottom);
+			} else if (object3d.position.y < bottom) {
+				object3d.position.setY(top);
+			}
 		}
 	}
 }

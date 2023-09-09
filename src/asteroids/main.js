@@ -39,6 +39,13 @@ const camera = new OrthographicCamera(
 );
 camera.position.z = 100;
 
+const areaBounds = {
+	top: camera.top,
+	bottom: camera.bottom,
+	left: camera.left,
+	right: camera.right,
+};
+
 const loader = new GLTFLoader().setPath("./assets/models/");
 function promisifiedGltfLoad(path) {
 	return new Promise((resolve, reject) => {
@@ -113,7 +120,7 @@ function step(timestampDifference) {
 		fireBullet(position, velocity);
 	}
 
-	movables.step(timestampDifference);
+	movables.step(timestampDifference, areaBounds);
 
 	for (const bullet of bullets) {
 		// Detect collisions
