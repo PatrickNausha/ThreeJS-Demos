@@ -37,7 +37,11 @@ export function createAsteroids(asteroidGltf, movables, scene) {
 
 		scene.add(asteroidMeshCopy);
 		asteroidMeshCopy.visible = false;
-		movables.add(asteroidMeshCopy, new Vector3(0, 0, 0), new Vector3(0, 0, 0));
+		movables.add(
+			asteroidMeshCopy,
+			new Vector3(0, 0, 0),
+			new Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
+		);
 		return asteroidMeshCopy;
 	});
 	asteroids = [...smallAsteroids, ...largeAsteroids];
