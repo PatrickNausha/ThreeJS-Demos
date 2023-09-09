@@ -117,6 +117,11 @@ function step(timestampDifference) {
 	for (const bullet of bullets) {
 		// Detect collisions
 		const asteroidCollisions = detectBulletCollisions(bullet.position);
+		if (asteroidCollisions.length) {
+			// Put bullet back in gun
+			bullet.position.set(0, 0, 0);
+			movables.setVelocity(bullet, new Vector3(0, 0, 0));
+		}
 		for (const asteroid of asteroidCollisions) {
 			explodeAsteroid(asteroid);
 		}
