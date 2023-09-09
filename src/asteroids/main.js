@@ -123,7 +123,7 @@ function step(timestampDifference) {
 			movables.setVelocity(bullet, new Vector3(0, 0, 0));
 		}
 		for (const asteroid of asteroidCollisions) {
-			explodeAsteroid(asteroid);
+			explodeAsteroid(asteroid, movables);
 		}
 	}
 }

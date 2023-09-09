@@ -40,19 +40,12 @@ export function resetAsteroids(gameAreaWidthMeters, gameAreaHeightMeters) {
 	}
 }
 
-export function explodeAsteroid(asteroid) {
+export function explodeAsteroid(asteroid, movables) {
 	asteroid.visible = false;
 	if (!smallAsteroids.includes(asteroid)) {
-		emitSmallAsteroid(asteroid.position.clone());
-		emitSmallAsteroid(asteroid.position.clone());
+		emitSmallAsteroid(asteroid.position.clone(), movables);
+		emitSmallAsteroid(asteroid.position.clone(), movables);
 	}
-}
-
-export function emitSmallAsteroid(position) {
-	const smallAsteroid = smallAsteroids[currentSmallAsteroid % smallAsteroids.length];
-	currentSmallAsteroid++;
-	smallAsteroid.visible = true;
-	smallAsteroid.position.copy(position);
 }
 
 export function detectBulletCollisions(bulletPosition) {
@@ -63,4 +56,14 @@ export function detectBulletCollisions(bulletPosition) {
 		}
 	}
 	return collisions;
+}
+
+function emitSmallAsteroid(position, movables) {
+	const smallAsteroid = smallAsteroids[currentSmallAsteroid % smallAsteroids.length];
+	currentSmallAsteroid++;
+	smallAsteroid.visible = true;
+	smallAsteroid.position.copy(position);
+	const velocity = new Vector3(20, 0, 0);
+	velocity.applyAxisAngle(new Vector3(0, 0, 1), 2 * Math.PI * Math.random());
+	movables.setVelocity(smallAsteroid, velocity);
 }
