@@ -177,6 +177,10 @@ animate();
 
 let nextBulletIndex = 0;
 let isCoolingDown = false;
+
+// Avoid pushing up sounds for now and annoying myself with the same noise over and over
+const audio = null;
+// const audio = new Audio("/assets/audio/laser-noise-2.wav");
 function fireBullet(position, velocity) {
 	if (isCoolingDown) {
 		return;
@@ -189,6 +193,11 @@ function fireBullet(position, velocity) {
 	movables.setVelocity(bullets[nextBulletIndex], velocity);
 
 	nextBulletIndex = (nextBulletIndex + 1) % bullets.length;
+	if (audio) {
+		audio.pause();
+		audio.currentTime = 0;
+		audio.play();
+	}
 }
 
 function resizeWindow() {
