@@ -16,6 +16,16 @@ import { Matrix4 } from "three";
 import { Movables } from "./movables";
 import { createAsteroids, resetAsteroids, detectBulletCollisions, explodeAsteroid } from "./asteroids";
 
+// TODO:
+// * Add thrust
+// * Add explosion effect
+// * Add real collision detection
+// * Fix bug where one bullet can take out multiple asteroids
+// * Add explosion sounds
+// * Make lasers look cool
+// * Handle game over scenario
+// * Add hyperspace
+
 const ambientLightColor = 0x111111;
 const aspectRatio = 4 / 3;
 

@@ -1,10 +1,5 @@
 import { Vector3 } from "three";
 
-// TODO:
-// * Import little asteroids.
-// * Make big roids explode into little ones.
-// * Add explosion effect.
-
 const asteroidRadius = 10;
 
 let asteroids = [];
