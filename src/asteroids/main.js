@@ -17,14 +17,21 @@ import { Movables } from "./movables";
 import { createAsteroids, resetAsteroids, detectBulletCollisions, explodeAsteroid } from "./asteroids";
 
 // TODO:
+// * Make small asteroids less round
+// * Make initial asteroids move
+// * Make asteroids not overlap on Z axis
+// * Tune initial placement of asteroids (study original game)
+// * Tune velocity of asteroids to match original game
+// * Bake normals onto low-poly meshes
 // * Add thrust
 // * Add explosion effect
 // * Add real collision detection
 // * Fix bug where one bullet can take out multiple asteroids
 // * Add explosion sounds
-// * Make lasers look cool
-// * Handle game over scenario
+// * Make lasers look cool. Add lights to them?
+// * Handle game over scenario. Make "loaded" bullets not collide with asteroids.
 // * Add hyperspace
+// * Add UFO
 
 const ambientLightColor = 0x111111;
 const aspectRatio = 4 / 3;
