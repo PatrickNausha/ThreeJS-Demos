@@ -12,7 +12,7 @@ let smallAsteroids = [];
 let currentSmallerAsteroid = 0;
 let smallerAsteroids = [];
 export function createAsteroids(asteroidGltf, movables, scene) {
-	const largeAsteroidCount = 7;
+	const largeAsteroidCount = 6;
 	const smallAsteroidCount = largeAsteroidCount * 2;
 	const smallerAsteroidCount = smallAsteroidCount * 2;
 	const largeAsteroidMeshes = asteroidGltf.scene.children.filter(({ userData }) =>
@@ -67,13 +67,22 @@ export function createAsteroids(asteroidGltf, movables, scene) {
 	asteroids = [...smallerAsteroids, ...smallAsteroids, ...largeAsteroids];
 }
 
-export function resetAsteroids(gameAreaWidthMeters, gameAreaHeightMeters) {
+export function resetAsteroids(areaBounds) {
+	const gameAreaWidthMeters = areaBounds.right - areaBounds.left;
+	const gameAreaHeightMeters = areaBounds.top - areaBounds.bottom;
 	for (const asteroid of asteroids) {
-		asteroid.position.set(
-			Math.random() * gameAreaWidthMeters - gameAreaWidthMeters / 2,
-			Math.random() * gameAreaHeightMeters - gameAreaHeightMeters / 2,
-			0
-		);
+		const startLocations = [
+			// Top of screen
+			[(Math.random() - 1) * gameAreaWidthMeters, areaBounds.top],
+			// Bottom of screen
+			[(Math.random() - 1) * gameAreaWidthMeters, areaBounds.bottom],
+			// Left of screen
+			[areaBounds.left, (Math.random() - 1) * gameAreaHeightMeters],
+			// Right of screen
+			[areaBounds.right, (Math.random() - 1) * gameAreaHeightMeters],
+		];
+		const startLocation = startLocations[Math.floor(Math.random() * startLocations.length)];
+		asteroid.position.set(startLocation[0], startLocation[1], 0);
 	}
 }
 
