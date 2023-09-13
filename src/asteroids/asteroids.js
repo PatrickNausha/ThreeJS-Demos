@@ -28,6 +28,7 @@ export function createAsteroids(asteroidGltf, movables, scene) {
 		const asteroidMeshCopy = largeAsteroidMeshes[index % largeAsteroidMeshes.length].clone();
 
 		scene.add(asteroidMeshCopy);
+		asteroidMeshCopy.visible = false;
 		const velocity = new Vector3(20, 0, 0);
 		velocity.applyAxisAngle(new Vector3(0, 0, 1), 2 * Math.PI * Math.random());
 		movables.add(
@@ -65,6 +66,10 @@ export function createAsteroids(asteroidGltf, movables, scene) {
 		return asteroidMeshCopy;
 	});
 	asteroids = [...smallerAsteroids, ...smallAsteroids, ...largeAsteroids];
+}
+
+export function areAnyAsteroidsLeft() {
+	return asteroids.some((asteroid) => asteroid.visible);
 }
 
 export function resetAsteroids(areaBounds) {

@@ -14,7 +14,23 @@ import { GUI } from "dat.gui";
 import { Vector3 } from "three";
 import { Matrix4 } from "three";
 import { Movables } from "./movables";
-import { createAsteroids, resetAsteroids, detectBulletCollisions, explodeAsteroid } from "./asteroids";
+import {
+	createAsteroids,
+	resetAsteroids,
+	detectBulletCollisions,
+	explodeAsteroid,
+	areAnyAsteroidsLeft,
+} from "./asteroids";
+
+// Gameplay notes
+// First level has 4 asteroids
+// Second level has 6 asteroids
+// Third level has 8 asteroids
+// Fourth level has 10 asteroids
+// Ship location does not reset
+// Sometimes when asteroid splits, smaller pieces are perfectly overlapping.
+// Rocks have varying velocities
+// Rocks spawn near edge of screen
 
 // TODO:
 // * Make small asteroids less round
@@ -32,6 +48,7 @@ import { createAsteroids, resetAsteroids, detectBulletCollisions, explodeAsteroi
 // * Handle game over scenario. Make "loaded" bullets not collide with asteroids.
 // * Add hyperspace
 // * Add UFO
+// * Add asteroid motion trail
 
 const ambientLightColor = 0x111111;
 const aspectRatio = 4 / 3;
@@ -121,6 +138,10 @@ const timeForBulletToTravelScreenVertically = 1.5; // seconds
 const shotSpeed = viewportHeightMeters / timeForBulletToTravelScreenVertically;
 const rotationSpeed = 3.0;
 function step(timestampDifference) {
+	if (!areAnyAsteroidsLeft()) {
+		resetAsteroids(areaBounds);
+	}
+
 	if (keyStates["ArrowLeft"]) {
 		movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, rotationSpeed));
 	} else if (keyStates["ArrowRight"]) {
