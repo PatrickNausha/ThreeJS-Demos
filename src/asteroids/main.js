@@ -84,7 +84,7 @@ let spaceCraft = null;
 	movables.add(spaceCraft, new Vector3(0, 0, 0), new Vector3(0, 0, 0));
 
 	createAsteroids(rockGltf, movables, scene);
-	resetAsteroids(viewportWidthMeters, viewportHeightMeters);
+	resetAsteroids(areaBounds);
 })();
 
 const guiParams = {
