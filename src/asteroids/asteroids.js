@@ -112,7 +112,7 @@ function emitSmallAsteroid(position, movables) {
 	currentSmallAsteroid++;
 	asteroid.visible = true;
 	asteroid.position.copy(position);
-	const velocity = new Vector3(20, 0, 0);
+	const velocity = new Vector3(30, 0, 0);
 	velocity.applyAxisAngle(new Vector3(0, 0, 1), 2 * Math.PI * Math.random());
 	movables.setVelocity(asteroid, velocity);
 }
@@ -122,7 +122,7 @@ function emitSmallerAsteroid(position, movables) {
 	currentSmallerAsteroid++;
 	asteroid.visible = true;
 	asteroid.position.copy(position);
-	const velocity = new Vector3(20, 0, 0);
+	const velocity = new Vector3(40, 0, 0);
 	velocity.applyAxisAngle(new Vector3(0, 0, 1), 2 * Math.PI * Math.random());
 	movables.setVelocity(asteroid, velocity);
 }
