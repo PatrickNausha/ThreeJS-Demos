@@ -70,16 +70,17 @@ export function createAsteroids(asteroidGltf, movables, scene) {
 export function resetAsteroids(areaBounds) {
 	const gameAreaWidthMeters = areaBounds.right - areaBounds.left;
 	const gameAreaHeightMeters = areaBounds.top - areaBounds.bottom;
-	for (const asteroid of asteroids) {
+	for (const asteroid of largeAsteroids) {
+		asteroid.visible = true;
 		const startLocations = [
 			// Top of screen
-			[(Math.random() - 1) * gameAreaWidthMeters, areaBounds.top],
+			[(Math.random() - 0.5) * gameAreaWidthMeters, areaBounds.top],
 			// Bottom of screen
-			[(Math.random() - 1) * gameAreaWidthMeters, areaBounds.bottom],
+			[(Math.random() - 0.5) * gameAreaWidthMeters, areaBounds.bottom],
 			// Left of screen
-			[areaBounds.left, (Math.random() - 1) * gameAreaHeightMeters],
+			[areaBounds.left, (Math.random() - 0.5) * gameAreaHeightMeters],
 			// Right of screen
-			[areaBounds.right, (Math.random() - 1) * gameAreaHeightMeters],
+			[areaBounds.right, (Math.random() - 0.5) * gameAreaHeightMeters],
 		];
 		const startLocation = startLocations[Math.floor(Math.random() * startLocations.length)];
 		asteroid.position.set(startLocation[0], startLocation[1], 0);
