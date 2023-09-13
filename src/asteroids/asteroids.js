@@ -28,9 +28,11 @@ export function createAsteroids(asteroidGltf, movables, scene) {
 		const asteroidMeshCopy = largeAsteroidMeshes[index % largeAsteroidMeshes.length].clone();
 
 		scene.add(asteroidMeshCopy);
+		const velocity = new Vector3(20, 0, 0);
+		velocity.applyAxisAngle(new Vector3(0, 0, 1), 2 * Math.PI * Math.random());
 		movables.add(
 			asteroidMeshCopy,
-			new Vector3(0, 0, 0),
+			velocity,
 			new Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1),
 			true
 		);
