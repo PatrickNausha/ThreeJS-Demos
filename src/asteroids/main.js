@@ -14,6 +14,7 @@ import { GUI } from "dat.gui";
 import { Vector3 } from "three";
 import { Matrix4 } from "three";
 import { Movables } from "./movables";
+import { Explosions } from "./explosions";
 import {
 	createAsteroids,
 	resetAsteroids,
@@ -61,6 +62,7 @@ document.body.appendChild(renderer.domElement);
 
 const scene = new Scene();
 const movables = new Movables();
+const explosions = new Explosions();
 
 // Camera
 const viewportHeightMeters = 320;
@@ -100,6 +102,7 @@ let spaceCraft = null;
 	scene.add(spaceCraft);
 	movables.add(spaceCraft, new Vector3(0, 0, 0), new Vector3(0, 0, 0));
 
+	explosions.initialize(scene, [], 30);
 	createAsteroids(rockGltf, movables, scene);
 	resetAsteroids(areaBounds);
 })();
@@ -159,6 +162,7 @@ function step(timestampDifference) {
 	}
 
 	movables.step(timestampDifference, areaBounds);
+	explosions.step(timestampDifference);
 
 	for (const bullet of bullets) {
 		// Detect collisions
@@ -170,6 +174,7 @@ function step(timestampDifference) {
 		}
 		for (const asteroid of asteroidCollisions) {
 			explodeAsteroid(asteroid, movables);
+			explosions.explode(asteroid.position.clone());
 		}
 	}
 }
