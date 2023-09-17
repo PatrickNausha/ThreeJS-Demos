@@ -102,6 +102,7 @@ let spaceCraft = null;
 	const [spaceCraftGltf, rockGltf, explosionTexture] = await Promise.all([
 		promisifiedGltfLoad("asteroids-spacecraft.gltf"),
 		promisifiedGltfLoad("asteroids-scene.gltf"),
+		// Credit: Cuzco on https://opengameart.org/content/explosion
 		promisifiedTextureLoad("explosion-sprite.png"),
 	]);
 
@@ -109,7 +110,7 @@ let spaceCraft = null;
 	scene.add(spaceCraft);
 	movables.add(spaceCraft, new Vector3(0, 0, 0), new Vector3(0, 0, 0));
 
-	explosions.initialize(scene, explosionTexture, 12, 4, 4);
+	explosions.initialize(scene, explosionTexture, 30, 4, 4);
 	createAsteroids(rockGltf, movables, scene);
 	resetAsteroids(areaBounds);
 })();

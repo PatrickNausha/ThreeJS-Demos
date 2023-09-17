@@ -76,9 +76,7 @@ class AnimatedSprite {
 			const verticalTileIndex = Math.floor(currentFrame / this.#horizontalTileCount);
 			const texture = this.#sprite.material.map;
 			texture.offset.setX(horizontalTileIndex / this.#horizontalTileCount);
-			const offsetY = 1 - 1 / this.#verticalTileCount - verticalTileIndex / this.#verticalTileCount;
-			console.log(offsetY);
-			texture.offset.setY(offsetY);
+			texture.offset.setY(-(1 + verticalTileIndex) / this.#verticalTileCount);
 		}
 	}
 }
