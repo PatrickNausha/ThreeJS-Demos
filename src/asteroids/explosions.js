@@ -1,12 +1,14 @@
-import { Sprite } from "three";
+import { Sprite, RepeatWrapping, SpriteMaterial } from "three";
 
 const spriteCount = 20;
 export class Explosions {
 	#sprites = [];
 	#nextSpriteIndex = 0;
 
-	initialize(scene, explosionTextures, fps) {
-		this.#sprites = Array.from({ length: spriteCount }).map(() => new AnimatedSprite(explosionTextures, fps));
+	initialize(scene, explosionTexture, fps, horizontalTileCount, verticalTileCount) {
+		this.#sprites = Array.from({ length: spriteCount }).map(
+			() => new AnimatedSprite(explosionTexture, fps, horizontalTileCount, verticalTileCount)
+		);
 		for (const sprite of this.#sprites) {
 			const threeSprite = sprite.getObject3d();
 			threeSprite.visible = false;
@@ -30,14 +32,23 @@ export class Explosions {
 
 class AnimatedSprite {
 	#elapsedTime = 0;
-	#textures = [];
-	#sprite = null;
+	#horizontalTileCount;
+	#verticalTileCount;
+	#sprite;
 	#fps = 0;
 
-	constructor(textures, fps) {
-		this.#textures = textures;
+	constructor(spriteSheetTexture, fps, horizontalTileCount, verticalTileCount) {
 		this.#fps = fps;
-		this.#sprite = new Sprite();
+		const texture = spriteSheetTexture.clone();
+		texture.needsUpdate = true;
+		texture.wrapS = texture.wrapT = RepeatWrapping;
+		this.#horizontalTileCount = horizontalTileCount;
+		this.#verticalTileCount = verticalTileCount;
+		texture.repeat.set(0.25, 0.25);
+
+		const spriteMaterial = new SpriteMaterial({ map: texture, color: 0xffffff });
+		this.#sprite = new Sprite(spriteMaterial);
+		this.#sprite.scale.set(50, 50, 1);
 	}
 
 	getObject3d() {
@@ -56,12 +67,18 @@ class AnimatedSprite {
 
 		this.#elapsedTime += deltaSeconds;
 
-		const currentFrame = this.#elapsedTime * this.#fps;
-		const texture = this.#textures.currentFrame;
-		if (currentFrame >= this.#textures.length) {
+		const currentFrame = Math.floor(this.#elapsedTime * this.#fps);
+		const frameCount = this.#verticalTileCount * this.#horizontalTileCount;
+		if (currentFrame >= frameCount) {
 			this.#sprite.visible = false;
 		} else {
-			// TODO: Set sprite texture to texture
+			const horizontalTileIndex = currentFrame % this.#horizontalTileCount;
+			const verticalTileIndex = Math.floor(currentFrame / this.#horizontalTileCount);
+			const texture = this.#sprite.material.map;
+			texture.offset.setX(horizontalTileIndex / this.#horizontalTileCount);
+			const offsetY = 1 - 1 / this.#verticalTileCount - verticalTileIndex / this.#verticalTileCount;
+			console.log(offsetY);
+			texture.offset.setY(offsetY);
 		}
 	}
 }

@@ -6,6 +6,7 @@ import {
 	OrthographicCamera,
 	DirectionalLight,
 	MeshBasicMaterial,
+	TextureLoader,
 	sRGBEncoding,
 } from "three";
 import { updateStats, toggleStats } from "../debug-stats";
@@ -82,27 +83,33 @@ const areaBounds = {
 	right: camera.right,
 };
 
-const loader = new GLTFLoader().setPath("./assets/models/");
+const gltfLoader = new GLTFLoader().setPath("./assets/models/");
 function promisifiedGltfLoad(path) {
 	return new Promise((resolve, reject) => {
-		loader.load(path, function (gltf) {
-			resolve(gltf);
-		});
+		gltfLoader.load(path, resolve);
+	});
+}
+
+const textureLoader = new TextureLoader().setPath("./assets/textures/");
+function promisifiedTextureLoad(path) {
+	return new Promise((resolve, reject) => {
+		textureLoader.load(path, resolve);
 	});
 }
 
 let spaceCraft = null;
 (async function load() {
-	const [spaceCraftGltf, rockGltf] = await Promise.all([
+	const [spaceCraftGltf, rockGltf, explosionTexture] = await Promise.all([
 		promisifiedGltfLoad("asteroids-spacecraft.gltf"),
 		promisifiedGltfLoad("asteroids-scene.gltf"),
+		promisifiedTextureLoad("explosion-sprite.png"),
 	]);
 
 	spaceCraft = spaceCraftGltf.scene;
 	scene.add(spaceCraft);
 	movables.add(spaceCraft, new Vector3(0, 0, 0), new Vector3(0, 0, 0));
 
-	explosions.initialize(scene, [], 30);
+	explosions.initialize(scene, explosionTexture, 12, 4, 4);
 	createAsteroids(rockGltf, movables, scene);
 	resetAsteroids(areaBounds);
 })();
