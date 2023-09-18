@@ -46,7 +46,7 @@ class AnimatedSprite {
 		texture.wrapS = texture.wrapT = RepeatWrapping;
 		this.#horizontalTileCount = horizontalTileCount;
 		this.#verticalTileCount = verticalTileCount;
-		texture.repeat.set(0.25, 0.25);
+		texture.repeat.set(1 / this.#horizontalTileCount, 1 / this.#verticalTileCount);
 
 		const spriteMaterial = new SpriteMaterial({ map: texture, color: 0xffffff });
 		this.#sprite = new Sprite(spriteMaterial);
