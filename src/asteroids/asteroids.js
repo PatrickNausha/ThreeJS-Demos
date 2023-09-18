@@ -92,15 +92,21 @@ export function resetAsteroids(areaBounds) {
 	}
 }
 
+export const asteroidSizeLarge = 0;
+export const asteroidSizeSmall = 1;
+export const asteroidSizeSmaller = 2;
 export function explodeAsteroid(asteroid, movables) {
 	asteroid.visible = false;
 	if (largeAsteroids.includes(asteroid)) {
 		emitSmallAsteroid(asteroid.position.clone(), movables);
 		emitSmallAsteroid(asteroid.position.clone(), movables);
+		return asteroidSizeLarge;
 	} else if (smallAsteroids.includes(asteroid)) {
 		emitSmallerAsteroid(asteroid.position.clone(), movables);
 		emitSmallerAsteroid(asteroid.position.clone(), movables);
+		return asteroidSizeSmall;
 	}
+	return asteroidSizeSmaller;
 }
 
 export function detectBulletCollisions(bulletPosition) {

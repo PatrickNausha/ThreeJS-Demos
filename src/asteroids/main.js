@@ -22,6 +22,9 @@ import {
 	detectBulletCollisions,
 	explodeAsteroid,
 	areAnyAsteroidsLeft,
+	asteroidSizeLarge,
+	asteroidSizeSmall,
+	asteroidSizeSmaller,
 } from "./asteroids";
 
 // Gameplay notes
@@ -148,6 +151,11 @@ for (const bullet of bullets) {
 const timeForBulletToTravelScreenVertically = 1.5; // seconds
 const shotSpeed = viewportHeightMeters / timeForBulletToTravelScreenVertically;
 const rotationSpeed = 3.0;
+const explosionSizeByAsteroidSize = {
+	[asteroidSizeLarge]: 64,
+	[asteroidSizeSmall]: 48,
+	[asteroidSizeSmaller]: 24,
+};
 function step(timestampDifference) {
 	if (!areAnyAsteroidsLeft()) {
 		resetAsteroids(areaBounds);
@@ -181,8 +189,10 @@ function step(timestampDifference) {
 			movables.setVelocity(bullet, new Vector3(0, 0, 0));
 		}
 		for (const asteroid of asteroidCollisions) {
-			explodeAsteroid(asteroid, movables);
-			explosions.explode(asteroid.position.clone());
+			const asteroidSize = explodeAsteroid(asteroid, movables);
+			const explosionPosition = asteroid.position.clone();
+			explosionPosition.setZ(10);
+			explosions.explode(explosionPosition, explosionSizeByAsteroidSize[asteroidSize]);
 		}
 	}
 }

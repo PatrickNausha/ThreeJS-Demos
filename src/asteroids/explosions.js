@@ -16,10 +16,12 @@ export class Explosions {
 		}
 	}
 
-	explode(position) {
+	explode(position, scale) {
 		const sprite = this.#sprites[this.#nextSpriteIndex % this.#sprites.length];
 		sprite.restart();
-		sprite.getObject3d().position.copy(position);
+		const threeJsSprite = sprite.getObject3d();
+		threeJsSprite.position.copy(position);
+		threeJsSprite.scale.set(scale, scale, 1);
 		this.#nextSpriteIndex++;
 	}
 
@@ -48,7 +50,6 @@ class AnimatedSprite {
 
 		const spriteMaterial = new SpriteMaterial({ map: texture, color: 0xffffff });
 		this.#sprite = new Sprite(spriteMaterial);
-		this.#sprite.scale.set(50, 50, 1);
 	}
 
 	getObject3d() {
