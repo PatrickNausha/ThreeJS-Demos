@@ -1,4 +1,4 @@
-import { Sprite, RepeatWrapping, SpriteMaterial } from "three";
+import { Sprite, RepeatWrapping, SpriteMaterial, AdditiveBlending } from "three";
 
 const spriteCount = 20;
 export class Explosions {
@@ -48,7 +48,12 @@ class AnimatedSprite {
 		this.#verticalTileCount = verticalTileCount;
 		texture.repeat.set(1 / this.#horizontalTileCount, 1 / this.#verticalTileCount);
 
-		const spriteMaterial = new SpriteMaterial({ map: texture, color: 0xffffff });
+		const spriteMaterial = new SpriteMaterial({
+			map: texture,
+			alphaMap: texture,
+			blending: AdditiveBlending,
+			color: 0xffffff,
+		});
 		this.#sprite = new Sprite(spriteMaterial);
 	}
 
