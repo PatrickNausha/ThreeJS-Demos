@@ -1,19 +1,18 @@
 import {
-	SphereGeometry,
 	Scene,
 	WebGLRenderer,
-	Mesh,
+	Sprite,
 	OrthographicCamera,
 	DirectionalLight,
-	MeshBasicMaterial,
+	SpriteMaterial,
 	TextureLoader,
+	AdditiveBlending,
 	sRGBEncoding,
 } from "three";
 import { updateStats, toggleStats } from "../debug-stats";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { GUI } from "dat.gui";
 import { Vector3 } from "three";
-import { Matrix4 } from "three";
 import { Movables } from "./movables";
 import { Explosions } from "./explosions";
 import {
@@ -38,14 +37,11 @@ import {
 // Rocks spawn near edge of screen
 
 // TODO:
-// * Make small asteroids less round
-// * Make initial asteroids move
 // * Make asteroids not overlap on Z axis
 // * Tune initial placement of asteroids (study original game)
 // * Tune velocity of asteroids to match original game
 // * Bake normals onto low-poly meshes
 // * Add thrust
-// * Add explosion effect
 // * Add real collision detection
 // * Fix bug where one bullet can take out multiple asteroids
 // * Add explosion sounds
@@ -102,11 +98,11 @@ function promisifiedTextureLoad(path) {
 
 let spaceCraft = null;
 (async function load() {
-	const [spaceCraftGltf, rockGltf, explosionTexture] = await Promise.all([
+	const [spaceCraftGltf, rockGltf, explosionTexture, laserTexture] = await Promise.all([
 		promisifiedGltfLoad("asteroids-spacecraft.gltf"),
 		promisifiedGltfLoad("asteroids-scene.gltf"),
-		// Credit: Cuzco on https://opengameart.org/content/explosion
 		promisifiedTextureLoad("explosion-sprite.png"),
+		promisifiedTextureLoad("laser-sprite.png"),
 	]);
 
 	spaceCraft = spaceCraftGltf.scene;
@@ -116,6 +112,7 @@ let spaceCraft = null;
 	explosions.initialize(scene, explosionTexture, 30, 4, 4);
 	createAsteroids(rockGltf, movables, scene);
 	resetAsteroids(areaBounds);
+	initializeBullets(laserTexture);
 })();
 
 const guiParams = {
@@ -140,12 +137,26 @@ gui.add(guiParams, "light2").onChange((value) => {
 
 toggleStats();
 
-const laserGeometry = new SphereGeometry(1, 5, 5);
-const laserMaterial = new MeshBasicMaterial({ color: 0x00ff00 });
-const bullets = Array.from({ length: 10 }).map(() => new Mesh(laserGeometry, laserMaterial));
-for (const bullet of bullets) {
-	scene.add(bullet);
-	movables.add(bullet, new Vector3(0, 0, 0), new Vector3(0, 0, 0));
+const bullets = [];
+function initializeBullets(texture) {
+	bullets.push(
+		...Array.from({ length: 10 }).map(() => {
+			const laserMaterial = new SpriteMaterial({
+				map: texture,
+				alphaMap: texture,
+				blending: AdditiveBlending,
+				color: 0xffffff,
+			});
+			const sprite = new Sprite(laserMaterial);
+			sprite.visible = false;
+			return sprite;
+		})
+	);
+	for (const bullet of bullets) {
+		bullet.scale.set(12, 12, 1);
+		scene.add(bullet);
+		movables.add(bullet, new Vector3(0, 0, 0), new Vector3(0, 0, 0));
+	}
 }
 
 const timeForBulletToTravelScreenVertically = 1.5; // seconds
@@ -171,10 +182,8 @@ function step(timestampDifference) {
 
 	if (keyStates["Space"]) {
 		const position = new Vector3(0, 5, -1);
-		const velocity = new Vector3(0, shotSpeed, 0);
-		velocity.applyMatrix4(new Matrix4().extractRotation(spaceCraft.matrix));
 		position.applyMatrix4(spaceCraft.matrix);
-		fireBullet(position, velocity);
+		fireBullet(position, spaceCraft.rotation.clone());
 	}
 
 	movables.step(timestampDifference, areaBounds);
@@ -186,6 +195,7 @@ function step(timestampDifference) {
 		if (asteroidCollisions.length) {
 			// Put bullet back in gun
 			bullet.position.set(0, 0, 0);
+			bullet.visible = false;
 			movables.setVelocity(bullet, new Vector3(0, 0, 0));
 		}
 		for (const asteroid of asteroidCollisions) {
@@ -240,9 +250,9 @@ let nextBulletIndex = 0;
 let isCoolingDown = false;
 
 // Avoid pushing up sounds for now and annoying myself with the same noise over and over
-const audio = null;
-// const audio = new Audio("/assets/audio/laser-noise-2.wav");
-function fireBullet(position, velocity) {
+// const audio = null;
+const audio = new Audio("/assets/audio/laser-noise-2.wav");
+function fireBullet(position, rotation) {
 	if (isCoolingDown) {
 		return;
 	}
@@ -250,7 +260,13 @@ function fireBullet(position, velocity) {
 	setTimeout(() => {
 		isCoolingDown = false;
 	}, 250);
+
+	const velocity = new Vector3(0, shotSpeed, 0);
+	velocity.applyEuler(rotation);
+
 	bullets[nextBulletIndex].position.copy(position);
+	bullets[nextBulletIndex].material.rotation = rotation.z;
+	bullets[nextBulletIndex].visible = true;
 	movables.setVelocity(bullets[nextBulletIndex], velocity);
 
 	nextBulletIndex = (nextBulletIndex + 1) % bullets.length;
