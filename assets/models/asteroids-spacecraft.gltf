@@ -25,9 +25,9 @@
 			"name":"Windshield",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
+					0.09271836280822754,
 					0,
-					0,
-					0,
+					0.08211437612771988,
 					1
 				],
 				"metallicFactor":0,
