@@ -24,6 +24,7 @@ import {
 	asteroidSizeLarge,
 	asteroidSizeSmall,
 	asteroidSizeSmaller,
+	detectSpaceCraftCollision,
 } from "./asteroids";
 
 // Gameplay notes
@@ -172,24 +173,26 @@ function step(timestampDifference) {
 		resetAsteroids(areaBounds);
 	}
 
-	if (keyStates["ArrowLeft"]) {
-		movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, rotationSpeed));
-	} else if (keyStates["ArrowRight"]) {
-		movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, -rotationSpeed));
-	} else {
-		movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, 0));
-	}
+	if (spaceCraft.visible) {
+		if (keyStates["ArrowLeft"]) {
+			movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, rotationSpeed));
+		} else if (keyStates["ArrowRight"]) {
+			movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, -rotationSpeed));
+		} else {
+			movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, 0));
+		}
 
-	if (keyStates["Space"]) {
-		const position = new Vector3(0, 5, -1);
-		position.applyMatrix4(spaceCraft.matrix);
-		fireBullet(position, spaceCraft.rotation.clone());
+		if (keyStates["Space"]) {
+			const position = new Vector3(0, 5, -1);
+			position.applyMatrix4(spaceCraft.matrix);
+			fireBullet(position, spaceCraft.rotation.clone());
+		}
 	}
 
 	movables.step(timestampDifference, areaBounds);
 	explosions.step(timestampDifference);
 
-	for (const bullet of bullets) {
+	for (const bullet of bullets.filter(({ visible }) => visible)) {
 		// Detect collisions
 		const asteroidCollisions = detectBulletCollisions(bullet.position);
 		if (asteroidCollisions.length) {
@@ -204,6 +207,11 @@ function step(timestampDifference) {
 			explosionPosition.setZ(10);
 			explosions.explode(explosionPosition, explosionSizeByAsteroidSize[asteroidSize]);
 		}
+	}
+
+	if (spaceCraft.visible && detectSpaceCraftCollision(spaceCraft.position)) {
+		explosions.explode(spaceCraft.position, 32);
+		spaceCraft.visible = false;
 	}
 }
 

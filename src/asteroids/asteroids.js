@@ -109,6 +109,16 @@ export function explodeAsteroid(asteroid, movables) {
 	return asteroidSizeSmaller;
 }
 
+export function detectSpaceCraftCollision(spaceCraftPosition) {
+	for (const asteroid of asteroids.filter(({ visible }) => visible)) {
+		if (spaceCraftPosition.distanceTo(asteroid.position) < asteroidRadius) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 export function detectBulletCollisions(bulletPosition) {
 	const collisions = [];
 	for (const asteroid of asteroids.filter(({ visible }) => visible)) {
