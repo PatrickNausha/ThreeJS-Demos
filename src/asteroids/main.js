@@ -194,16 +194,16 @@ function step(timestampDifference) {
 
 	for (const bullet of bullets.filter(({ visible }) => visible)) {
 		// Detect collisions
-		const asteroidCollisions = detectBulletCollisions(bullet.position);
+		const asteroidCollisions = detectBulletCollisions(bullet.position, movables.getVelocity(bullet));
 		if (asteroidCollisions.length) {
 			// Put bullet back in gun
 			bullet.position.set(0, 0, 0);
 			bullet.visible = false;
 			movables.setVelocity(bullet, new Vector3(0, 0, 0));
 		}
-		for (const asteroid of asteroidCollisions) {
-			const asteroidSize = explodeAsteroid(asteroid, movables);
-			const explosionPosition = asteroid.position.clone();
+		for (const { object } of asteroidCollisions) {
+			const asteroidSize = explodeAsteroid(object, movables);
+			const explosionPosition = object.position.clone();
 			explosionPosition.setZ(10);
 			explosions.explode(explosionPosition, explosionSizeByAsteroidSize[asteroidSize]);
 		}

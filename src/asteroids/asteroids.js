@@ -1,4 +1,4 @@
-import { Vector3 } from "three";
+import { Raycaster, Vector3 } from "three";
 
 const asteroidRadius = 10;
 
@@ -119,14 +119,11 @@ export function detectSpaceCraftCollision(spaceCraftPosition) {
 	return false;
 }
 
-export function detectBulletCollisions(bulletPosition) {
-	const collisions = [];
-	for (const asteroid of asteroids.filter(({ visible }) => visible)) {
-		if (bulletPosition.distanceTo(asteroid.position) < asteroidRadius) {
-			collisions.push(asteroid);
-		}
-	}
-	return collisions;
+export function detectBulletCollisions(bulletPosition, bulletVelocity) {
+	const visibleAsteroids = asteroids.filter(({ visible }) => visible);
+	const ray = new Raycaster(bulletPosition, bulletVelocity.clone().normalize(), 0, 10);
+	const collisionResults = ray.intersectObjects(visibleAsteroids);
+	return collisionResults;
 }
 
 function emitSmallAsteroid(position, movables) {

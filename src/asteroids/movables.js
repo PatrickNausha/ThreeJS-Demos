@@ -32,6 +32,15 @@ export class Movables {
 		this.#movables.set(object3d, { ...movable, velocity });
 	}
 
+	getVelocity(object3d) {
+		const movable = this.#movables.get(object3d);
+		if (!movable) {
+			console.error("Unknown object", object3d);
+			throw new Error("Unknown object");
+		}
+		return movable.velocity.clone();
+	}
+
 	step(timestampDifference, areaBounds) {
 		const { top, bottom, left, right } = areaBounds;
 		for (const [object3d, { velocity, angularVelocity, shouldWrap }] of this.#movables) {
