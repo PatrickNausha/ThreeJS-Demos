@@ -237,6 +237,7 @@ scene.add(blueLight);
 
 // Main loop
 let lastTimestamp;
+const maxStepSizeMs = 10;
 function animate(timestamp) {
 	const timestampDifference = timestamp - lastTimestamp;
 	requestAnimationFrame(animate);
@@ -246,7 +247,12 @@ function animate(timestamp) {
 	}
 
 	if (lastTimestamp) {
-		step(timestampDifference / 1000);
+		let remainingStepMs = timestampDifference;
+		while (remainingStepMs > 0) {
+			const stepMs = Math.min(maxStepSizeMs, remainingStepMs);
+			step(stepMs / 1000);
+			remainingStepMs -= stepMs;
+		}
 	}
 	renderer.render(scene, camera);
 	updateStats();
