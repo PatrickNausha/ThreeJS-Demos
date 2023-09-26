@@ -119,12 +119,16 @@ export function detectSpaceCraftCollision(spaceCraftPosition) {
 	return false;
 }
 
+const maxAsteroidSize = 20;
 export function detectBulletCollisions(bulletPosition, bulletVelocity) {
 	const visibleAsteroids = asteroids.filter(({ visible }) => visible);
+	const nearAsteroids = visibleAsteroids.filter(
+		({ position }) => bulletPosition.distanceTo(position) < maxAsteroidSize
+	);
 	const direction = bulletVelocity.clone().normalize();
 	const origin = new Vector3().subVectors(bulletPosition, direction);
 	const ray = new Raycaster(origin, direction, 0, 2);
-	const collisionResults = ray.intersectObjects(visibleAsteroids);
+	const collisionResults = ray.intersectObjects(nearAsteroids);
 	return collisionResults;
 }
 

@@ -238,8 +238,9 @@ scene.add(blueLight);
 // Main loop
 let lastTimestamp;
 const maxStepSizeMs = 10;
+const maxTotalStepsMs = 100; // Just let it slow down so it can catch up
 function animate(timestamp) {
-	const timestampDifference = timestamp - lastTimestamp;
+	const timestampDifference = Math.min(timestamp - lastTimestamp, maxTotalStepsMs);
 	requestAnimationFrame(animate);
 	if (!spaceCraft) {
 		// Wait for assets to load.
