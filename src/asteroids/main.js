@@ -265,7 +265,7 @@ let isCoolingDown = false;
 
 // Avoid pushing up sounds for now and annoying myself with the same noise over and over
 // const audio = null;
-const audio = new Audio("/assets/audio/laser-noise-2.wav");
+const audio = new Audio("./assets/audio/laser-noise-2.wav");
 function fireBullet(position, rotation) {
 	if (isCoolingDown) {
 		return;
