@@ -121,7 +121,9 @@ export function detectSpaceCraftCollision(spaceCraftPosition) {
 
 export function detectBulletCollisions(bulletPosition, bulletVelocity) {
 	const visibleAsteroids = asteroids.filter(({ visible }) => visible);
-	const ray = new Raycaster(bulletPosition, bulletVelocity.clone().normalize(), 0, 10);
+	const direction = bulletVelocity.clone().normalize();
+	const origin = new Vector3().subVectors(bulletPosition, direction);
+	const ray = new Raycaster(origin, direction, 0, 2);
 	const collisionResults = ray.intersectObjects(visibleAsteroids);
 	return collisionResults;
 }
