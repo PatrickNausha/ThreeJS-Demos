@@ -153,7 +153,7 @@ function initializeBullets(texture) {
 		})
 	);
 	for (const bullet of bullets) {
-		bullet.scale.set(12, 12, 1);
+		bullet.scale.set(8, 8, 1);
 		scene.add(bullet);
 		movables.add(bullet, new Vector3(0, 0, 0), new Vector3(0, 0, 0));
 	}
