@@ -1,4 +1,4 @@
-const globalDrag = 0.1;
+const globalDrag = 0.4;
 
 export class Movables {
 	#movables = new Map();

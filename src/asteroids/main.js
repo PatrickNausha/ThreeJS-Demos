@@ -168,7 +168,7 @@ const explosionSizeByAsteroidSize = {
 	[asteroidSizeSmall]: 48,
 	[asteroidSizeSmaller]: 24,
 };
-const thrustAcceleration = 35;
+const thrustAcceleration = 40;
 function step(timestampDifference) {
 	if (!areAnyAsteroidsLeft()) {
 		resetAsteroids(areaBounds);
@@ -179,12 +179,14 @@ function step(timestampDifference) {
 			movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, rotationSpeed));
 		} else if (keyStates["ArrowRight"]) {
 			movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, -rotationSpeed));
-		} else if (keyStates["ArrowUp"]) {
+		} else {
+			movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, 0));
+		}
+
+		if (keyStates["ArrowUp"]) {
 			const acceleration = new Vector3(0, thrustAcceleration * timestampDifference, 0);
 			acceleration.applyEuler(spaceCraft.rotation);
 			movables.accelerate(spaceCraft, acceleration);
-		} else {
-			movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, 0));
 		}
 
 		if (keyStates["Space"]) {
