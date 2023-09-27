@@ -1,7 +1,9 @@
+const globalDrag = 0.1;
+
 export class Movables {
 	#movables = new Map();
 
-	add(object3d, velocity, angularVelocity, shouldWrap = false) {
+	add(object3d, velocity, angularVelocity, shouldWrap = false, hasDrag = false) {
 		if (!object3d) {
 			throw new Error("object3d parameter is required");
 		}
@@ -11,7 +13,7 @@ export class Movables {
 		if (!angularVelocity) {
 			throw new Error("angularVelocity parameter is required");
 		}
-		this.#movables.set(object3d, { velocity, angularVelocity, shouldWrap });
+		this.#movables.set(object3d, { velocity, angularVelocity, shouldWrap, hasDrag });
 	}
 
 	setAngularVelocity(object3d, angularVelocity) {
@@ -32,6 +34,15 @@ export class Movables {
 		this.#movables.set(object3d, { ...movable, velocity });
 	}
 
+	accelerate(object3d, acceleration) {
+		const movable = this.#movables.get(object3d);
+		if (!movable) {
+			console.error("Unknown object", object3d);
+			throw new Error("Unknown object");
+		}
+		movable.velocity.add(acceleration);
+	}
+
 	getVelocity(object3d) {
 		const movable = this.#movables.get(object3d);
 		if (!movable) {
@@ -43,7 +54,14 @@ export class Movables {
 
 	step(timestampDifference, areaBounds) {
 		const { top, bottom, left, right } = areaBounds;
-		for (const [object3d, { velocity, angularVelocity, shouldWrap }] of this.#movables) {
+		for (const [object3d, { velocity, angularVelocity, shouldWrap, hasDrag }] of this.#movables) {
+			if (hasDrag) {
+				const dragAcceleration = velocity
+					.clone()
+					.negate()
+					.multiplyScalar(globalDrag * timestampDifference);
+				velocity.add(dragAcceleration);
+			}
 			object3d.rotateX(timestampDifference * angularVelocity.x);
 			object3d.rotateY(timestampDifference * angularVelocity.y);
 			object3d.rotateZ(timestampDifference * angularVelocity.z);

@@ -108,7 +108,7 @@ let spaceCraft = null;
 
 	spaceCraft = spaceCraftGltf.scene;
 	scene.add(spaceCraft);
-	movables.add(spaceCraft, new Vector3(0, 0, 0), new Vector3(0, 0, 0));
+	movables.add(spaceCraft, new Vector3(0, 0, 0), new Vector3(0, 0, 0), true, true);
 
 	explosions.initialize(scene, explosionTexture, 30, 4, 4);
 	createAsteroids(rockGltf, movables, scene);
@@ -168,6 +168,7 @@ const explosionSizeByAsteroidSize = {
 	[asteroidSizeSmall]: 48,
 	[asteroidSizeSmaller]: 24,
 };
+const thrustAcceleration = 35;
 function step(timestampDifference) {
 	if (!areAnyAsteroidsLeft()) {
 		resetAsteroids(areaBounds);
@@ -178,6 +179,10 @@ function step(timestampDifference) {
 			movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, rotationSpeed));
 		} else if (keyStates["ArrowRight"]) {
 			movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, -rotationSpeed));
+		} else if (keyStates["ArrowUp"]) {
+			const acceleration = new Vector3(0, thrustAcceleration * timestampDifference, 0);
+			acceleration.applyEuler(spaceCraft.rotation);
+			movables.accelerate(spaceCraft, acceleration);
 		} else {
 			movables.setAngularVelocity(spaceCraft, new Vector3(0, 0, 0));
 		}
