@@ -98,6 +98,7 @@ function promisifiedTextureLoad(path) {
 }
 
 let spaceCraft = null;
+let exhaust = null;
 (async function load() {
 	const [spaceCraftGltf, rockGltf, explosionTexture, laserTexture] = await Promise.all([
 		promisifiedGltfLoad("asteroids-spacecraft.gltf"),
@@ -109,7 +110,8 @@ let spaceCraft = null;
 	spaceCraft = spaceCraftGltf.scene;
 	scene.add(spaceCraft);
 	movables.add(spaceCraft, new Vector3(0, 0, 0), new Vector3(0, 0, 0), true, true);
-
+	exhaust = spaceCraft.children[0].children.find(({ name }) => name === "exhaust-sprite");
+	exhaust.visible = false;
 	explosions.initialize(scene, explosionTexture, 30, 4, 4);
 	createAsteroids(rockGltf, movables, scene);
 	resetAsteroids(areaBounds);
@@ -187,6 +189,9 @@ function step(timestampDifference) {
 			const acceleration = new Vector3(0, thrustAcceleration * timestampDifference, 0);
 			acceleration.applyEuler(spaceCraft.rotation);
 			movables.accelerate(spaceCraft, acceleration);
+			exhaust.visible = true;
+		} else {
+			exhaust.visible = false;
 		}
 
 		if (keyStates["Space"]) {
