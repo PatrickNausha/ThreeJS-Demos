@@ -26,6 +26,7 @@ import {
 	asteroidSizeSmaller,
 	detectSpaceCraftCollision,
 } from "./asteroids";
+import { startEngineSound, stopEngineSound } from "./audio";
 
 // Gameplay notes
 // First level has 4 asteroids
@@ -190,7 +191,9 @@ function step(timestampDifference) {
 			acceleration.applyEuler(spaceCraft.rotation);
 			movables.accelerate(spaceCraft, acceleration);
 			exhaust.visible = true;
+			startEngineSound();
 		} else {
+			stopEngineSound();
 			exhaust.visible = false;
 		}
 
@@ -199,6 +202,8 @@ function step(timestampDifference) {
 			position.applyMatrix4(spaceCraft.matrix);
 			fireBullet(position, spaceCraft.rotation.clone());
 		}
+	} else {
+		stopEngineSound();
 	}
 
 	movables.step(timestampDifference, areaBounds);

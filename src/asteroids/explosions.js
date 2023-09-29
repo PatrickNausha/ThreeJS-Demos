@@ -1,14 +1,8 @@
 import { Sprite, RepeatWrapping, SpriteMaterial, AdditiveBlending } from "three";
+import { playExplosionSound } from "./audio";
 
 const spriteCount = 20;
-// https://sfxr.me/#7BMHBGBrvPrKMz7vdnH2arTppbTGtPrik6ypYCJazirRsGBVeid2uaLtz37CSy69ZJjGJ7C8h9NjU1LRXtL5tgW9vaPUQvE92L3q7UfV4TSbUF1N2G3urTRqZ
-// https://sfxr.me/#7BMHBGBrvPrKMz7vdnH2arSxENYbWUNps8g7nqouBB9smtxAq2PYYsVoa5sjrzVZo7VNpDFNrSQTNtinkTFut1aGJnuigdFUTrtf7aaih5chRw6UQ5bBqVNz3
-const explosionAudios = [
-	new Audio("./assets/audio/explosion-3.wav"),
-	new Audio("./assets/audio/explosion-4.wav"),
-	new Audio("./assets/audio/explosion-3.wav"),
-	new Audio("./assets/audio/explosion-4.wav"),
-];
+const explosionAudios = [];
 export class Explosions {
 	#sprites = [];
 	#nextSpriteIndex = 0;
@@ -31,7 +25,7 @@ export class Explosions {
 		threeJsSprite.position.copy(position);
 		threeJsSprite.scale.set(scale, scale, 1);
 		this.#nextSpriteIndex++;
-		explosionAudios[this.#nextSpriteIndex % explosionAudios.length].play();
+		playExplosionSound();
 	}
 
 	step(deltaSeconds) {
