@@ -8,10 +8,25 @@ const explosionPlayers = ["./assets/audio/explosion-3.wav", "./assets/audio/expl
 	new Tone.Player({ url, autostart: false }).toDestination()
 );
 
+explosionPlayers[0].connect(
+	new Tone.Filter({
+		type: "lowpass",
+		frequency: 500,
+		rolloff: -48,
+	}).toDestination()
+);
+explosionPlayers[1].connect(
+	new Tone.Filter({
+		type: "lowpass",
+		frequency: 500,
+		rolloff: -48,
+	}).toDestination()
+);
+
 const engineSynth = new Tone.NoiseSynth({
 	noise: {
-		type: "brown", // Use pink noise for a smoother sound
-		playbackRate: 2,
+		type: "brown",
+		playbackRate: 1.5,
 	},
 	envelope: {
 		attack: 0.1,
@@ -23,7 +38,7 @@ const engineSynth = new Tone.NoiseSynth({
 
 const engineLowpassFilter = new Tone.Filter({
 	type: "lowpass",
-	frequency: 1000,
+	frequency: 500,
 	rolloff: -48,
 }).toDestination();
 
