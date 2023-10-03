@@ -7,7 +7,9 @@ import {
 	SpriteMaterial,
 	TextureLoader,
 	AdditiveBlending,
+	Group,
 	sRGBEncoding,
+	PointLight,
 } from "three";
 import { updateStats, toggleStats } from "../debug-stats";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -133,6 +135,7 @@ const guiParams = {
 	light0: true,
 	light1: true,
 	light2: true,
+	"laser lights": false,
 	animateLights: true,
 	model: "sphere",
 };
@@ -146,6 +149,11 @@ gui.add(guiParams, "light1").onChange((value) => {
 });
 gui.add(guiParams, "light2").onChange((value) => {
 	orangeLight.visible = value;
+});
+gui.add(guiParams, "laser lights").onChange((value) => {
+	for (const { children } of bullets) {
+		children[1].visible = value;
+	}
 });
 
 toggleStats();
@@ -161,12 +169,16 @@ function initializeBullets(texture) {
 				color: 0xffffff,
 			});
 			const sprite = new Sprite(laserMaterial);
-			sprite.visible = false;
-			return sprite;
+			sprite.scale.set(8, 8, 1);
+			const bulletGroup = new Group();
+			bulletGroup.add(sprite);
+			bulletGroup.add(new PointLight(0x00ff00, 1, 75));
+			bulletGroup.children[1].visible = false;
+			bulletGroup.visible = false;
+			return bulletGroup;
 		})
 	);
 	for (const bullet of bullets) {
-		bullet.scale.set(8, 8, 1);
 		scene.add(bullet);
 		movables.add(bullet, new Vector3(0, 0, 0), new Vector3(0, 0, 0));
 	}
@@ -207,7 +219,7 @@ function step(timestampDifference) {
 		}
 
 		if (keyStates["Space"]) {
-			const position = new Vector3(0, 5, -1);
+			const position = new Vector3(0, 5, 0);
 			position.applyMatrix4(spaceCraft.matrix);
 			fireBullet(position, spaceCraft.rotation.clone());
 		}
@@ -320,8 +332,9 @@ function fireBullet(position, rotation) {
 	const velocity = new Vector3(0, shotSpeed, 0);
 	velocity.applyEuler(rotation);
 
+	const bulletSprite = bullets[nextBulletIndex].children[0];
+	bulletSprite.material.rotation = rotation.z;
 	bullets[nextBulletIndex].position.copy(position);
-	bullets[nextBulletIndex].material.rotation = rotation.z;
 	bullets[nextBulletIndex].visible = true;
 	movables.setVelocity(bullets[nextBulletIndex], velocity);
 
