@@ -29,6 +29,7 @@ import {
 	detectSpaceCraftCollision,
 } from "./asteroids";
 import { startEngineSound, stopEngineSound } from "./audio";
+import { Warpables } from "./warpables";
 
 // Gameplay notes
 // First level has 4 asteroids
@@ -65,8 +66,6 @@ renderer.setPixelRatio(window.devicePixelRatio || 1);
 document.body.appendChild(renderer.domElement);
 
 const scene = new Scene();
-const movables = new Movables();
-const explosions = new Explosions();
 
 // Camera
 const viewportHeightMeters = 320;
@@ -85,6 +84,15 @@ const areaBounds = {
 	left: camera.left,
 	right: camera.right,
 };
+
+const movables = new Movables();
+const explosions = new Explosions();
+const warpables = new Warpables(movables, {
+	top: areaBounds.top - 20,
+	bottom: areaBounds.bottom + 20,
+	left: areaBounds.left + 20,
+	right: areaBounds.right - 20,
+});
 
 const gltfLoader = new GLTFLoader().setPath("./assets/models/");
 function promisifiedGltfLoad(path) {
@@ -218,6 +226,10 @@ function step(timestampDifference) {
 			exhaust.visible = false;
 		}
 
+		if (keyStates["ArrowDown"]) {
+			warpables.warp(spaceCraft);
+		}
+
 		if (keyStates["Space"]) {
 			const position = new Vector3(0, 5, 0);
 			position.applyMatrix4(spaceCraft.matrix);
@@ -229,6 +241,7 @@ function step(timestampDifference) {
 
 	movables.step(timestampDifference, areaBounds);
 	explosions.step(timestampDifference);
+	warpables.step(timestampDifference);
 
 	for (const bullet of bullets.filter(({ visible }) => visible)) {
 		// Detect collisions
@@ -315,18 +328,18 @@ document.getElementById("restart-button").addEventListener("click", () => {
 });
 
 let nextBulletIndex = 0;
-let isCoolingDown = false;
+let isGunCoolingDown = false;
 
 // Avoid pushing up sounds for now and annoying myself with the same noise over and over
 // const audio = null;
 const audio = new Audio("./assets/audio/laser-noise-2.wav");
 function fireBullet(position, rotation) {
-	if (isCoolingDown) {
+	if (isGunCoolingDown) {
 		return;
 	}
-	isCoolingDown = true;
+	isGunCoolingDown = true;
 	setTimeout(() => {
-		isCoolingDown = false;
+		isGunCoolingDown = false;
 	}, 250);
 
 	const velocity = new Vector3(0, shotSpeed, 0);
