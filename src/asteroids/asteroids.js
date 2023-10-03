@@ -90,6 +90,10 @@ export function resetAsteroids(areaBounds) {
 		const startLocation = startLocations[Math.floor(Math.random() * startLocations.length)];
 		asteroid.position.set(startLocation[0], startLocation[1], 0);
 	}
+
+	for (const asteroid of [...smallAsteroids, ...smallerAsteroids]) {
+		asteroid.visible = false;
+	}
 }
 
 export const asteroidSizeLarge = 0;

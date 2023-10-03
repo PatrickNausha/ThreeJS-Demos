@@ -100,7 +100,7 @@ function promisifiedTextureLoad(path) {
 
 let spaceCraft = null;
 let exhaust = null;
-(async function load() {
+const loadPromise = (async function load() {
 	const [spaceCraftGltf, rockGltf, explosionTexture, laserTexture] = await Promise.all([
 		promisifiedGltfLoad("asteroids-spacecraft.gltf"),
 		promisifiedGltfLoad("asteroids-scene.gltf"),
@@ -115,9 +115,18 @@ let exhaust = null;
 	exhaust.visible = false;
 	explosions.initialize(scene, explosionTexture, 30, 4, 4);
 	createAsteroids(rockGltf, movables, scene);
-	resetAsteroids(areaBounds);
 	initializeBullets(laserTexture);
+
+	resetGame();
 })();
+
+function resetGame() {
+	spaceCraft.visible = true;
+	resetAsteroids(areaBounds);
+	spaceCraft.position.set(0, 0, 0);
+	spaceCraft.rotation.set(0, 0, 0);
+	movables.setVelocity(spaceCraft, new Vector3());
+}
 
 const guiParams = {
 	debugLights: true,
@@ -229,6 +238,7 @@ function step(timestampDifference) {
 	if (spaceCraft.visible && detectSpaceCraftCollision(spaceCraft.position)) {
 		explosions.explode(spaceCraft.position, 32);
 		spaceCraft.visible = false;
+		gameOverScreen.classList.toggle("d-none");
 	}
 }
 
@@ -252,31 +262,45 @@ const blueLight = new DirectionalLight(0x0077ff, 0.5);
 blueLight.position.set(-1, 1, 0.5);
 scene.add(blueLight);
 
-// Main loop
-let lastTimestamp;
 const maxStepSizeMs = 10;
 const maxTotalStepsMs = 100; // Just let it slow down so it can catch up
-function animate(timestamp) {
-	const timestampDifference = Math.min(timestamp - lastTimestamp, maxTotalStepsMs);
-	requestAnimationFrame(animate);
-	if (!spaceCraft) {
-		// Wait for assets to load.
-		return;
-	}
-
-	if (lastTimestamp) {
-		let remainingStepMs = timestampDifference;
-		while (remainingStepMs > 0) {
-			const stepMs = Math.min(maxStepSizeMs, remainingStepMs);
-			step(stepMs / 1000);
-			remainingStepMs -= stepMs;
+async function startMainLoop() {
+	await loadPromise;
+	let lastTimestamp;
+	function animate(timestamp) {
+		const timestampDifference = Math.min(timestamp - lastTimestamp, maxTotalStepsMs);
+		requestAnimationFrame(animate);
+		if (!spaceCraft) {
+			// Wait for assets to load.
+			return;
 		}
+
+		if (lastTimestamp) {
+			let remainingStepMs = timestampDifference;
+			while (remainingStepMs > 0) {
+				const stepMs = Math.min(maxStepSizeMs, remainingStepMs);
+				step(stepMs / 1000);
+				remainingStepMs -= stepMs;
+			}
+		}
+		renderer.render(scene, camera);
+		updateStats();
+		lastTimestamp = timestamp;
 	}
-	renderer.render(scene, camera);
-	updateStats();
-	lastTimestamp = timestamp;
+	animate();
 }
-animate();
+
+const startScreen = document.getElementById("start-screen");
+document.getElementById("start-button").addEventListener("click", () => {
+	startMainLoop();
+	startScreen.remove();
+});
+
+const gameOverScreen = document.getElementById("game-over-screen");
+document.getElementById("restart-button").addEventListener("click", () => {
+	resetGame();
+	gameOverScreen.classList.toggle("d-none");
+});
 
 let nextBulletIndex = 0;
 let isCoolingDown = false;
