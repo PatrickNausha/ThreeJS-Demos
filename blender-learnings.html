@@ -23,10 +23,8 @@
 		</div>
 		<div class="demo py-5">
 			<div class="container">
-				<h2>Asteroids Minigame</h2>
-				<p>
-					The following are things I learned while creating <a href="./asteroids.html">my Asteroids clone</a>.
-				</p>
+				<h2>How I created the models for my <a href="./asteroids.html">Asteroids clone</a></h2>
+				<p>I wanted to create the artwork for a game from scratch. The following is how I did it in Blender.</p>
 				<h3>Procedurally generated asteroids</h3>
 				<p>
 					Instead of modelling individual asteroids repeatedly, I saved time by generating them procedurally
@@ -87,8 +85,22 @@
 				<a href="/static/assets/screenshots/crater-nodes-zoomed-in.png" target="_blank"
 					><img width="613" height="397" src="/static/assets/screenshots/crater-nodes-zoomed-in.png"
 				/></a>
+				<h3>Modelling the spacecraft</h3>
+				<p>
+					This was pretty straightforward so I won't go into detail. I rough sketched a basic spacecraft whose
+					silhouette is inspired by the original Asteroids craft. I resized, extruded, and added edge loops to
+					a cylinder until I got the desired shape. I used a boolean operation with a stretched quarter sphere
+					to add the cockpit. After applying the boolean modifier, I manually cleaned up the topology. The
+					main goal was to keep the topology clean so I could reduce the poly count by removing unnecessary
+					edge loops in the final model.
+				</p>
+				<a href="/static/assets/screenshots/spacecraft-wireframe.png" target="_blank"
+					><img width="613" height="397" src="/static/assets/screenshots/spacecraft-wireframe.png"
+				/></a>
+				<h3>Rendering exhaust and laser sprites</h3>
+				<p>Coming Soon</p>
 				<h3>Baking normal maps</h3>
-				<p>TODO: Fill in this section.</p>
+				<p>Coming Soon</p>
 			</div>
 		</div>
 	</body>
