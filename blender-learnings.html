@@ -28,7 +28,11 @@
 					The following are things I learned while creating <a href="./asteroids.html">my Asteroids clone</a>.
 				</p>
 				<h3>Procedurally generated asteroids</h3>
-				<p>I used a chain of geometry nodes to produce the asteroids. In order, these were</p>
+				<p>
+					Instead of modelling individual asteroids repeatedly, I saved time by generating them procedurally
+					and tweaking the inputs until I found something I liked. I used a chain of Geometry Nodes to produce
+					the asteroids. In order, these were
+				</p>
 				<ol>
 					<li>
 						Node to create an icosphere that was distorted into a random, less spherical shape. This is the
@@ -37,16 +41,52 @@
 					<li>A node that created random craters.</li>
 					<li>A repeat of the random craters node to apply more craters of a smaller size.</li>
 				</ol>
-				<h4>Node for random asteroid shape</h4>
-				<p>TODO: Fill in this section.</p>
-				<h4>Node for craters</h4>
+				<h4>Nodes for random asteroid shape</h4>
+				<p>
+					I used an Ico Sphere node to start with a round shape and then used a noise texture to offset the
+					vertices into random locations to produce a random, yet natural-looking shape. Here's what the final
+					Geometry Nodes ended up looking like:
+				</p>
+				<a href="/static/assets/screenshots/asteroid-shape-nodes.png" target="_blank"
+					><img width="613" height="397" src="/static/assets/screenshots/asteroid-shape-nodes.png"
+				/></a>
+				<h4>Nodes for craters</h4>
 				<p>
 					I followed
 					<a href="https://www.youtube.com/watch?v=vIGpGezfz2A&ab_channel=TwoDancingClams" target="_blank"
 						>this tutorial video</a
 					>
-					with some simplifications.
+					but used the following simplifications.
 				</p>
+				<ul>
+					<li>
+						I used the new
+						<a
+							href="https://docs.blender.org/manual/en/3.5/modeling/geometry_nodes/geometry/sample/geometry_proximity.html"
+							>Geometry Proximity Node</a
+						>
+						which makes it much easier to compute the distance between any point and the center of a crater.
+						Note: The Transfer Attribute node used in the YouTube tutorial
+						<a
+							href="https://blender.stackexchange.com/questions/276087/where-is-transfer-attribute-in-3-4"
+							target="_blank"
+						>
+							has been removed in Blender</a
+						>
+						so you may need the Geometry Proximity Node alternative anyway.
+					</li>
+					<li>
+						Instead of having the same Geometry Nodes modifier generate all craters, I applied the same
+						nodes multiple times. This made the nodes easier to write and gave me more fine-grained control.
+					</li>
+				</ul>
+				<p>Here's what the final Geometry Nodes ended up looking like:</p>
+				<a href="/static/assets/screenshots/crater-nodes-top.png" target="_blank"
+					><img width="613" height="397" src="/static/assets/screenshots/crater-nodes-top.png"
+				/></a>
+				<a href="/static/assets/screenshots/crater-nodes-zoomed-in.png" target="_blank"
+					><img width="613" height="397" src="/static/assets/screenshots/crater-nodes-zoomed-in.png"
+				/></a>
 				<h3>Baking normal maps</h3>
 				<p>TODO: Fill in this section.</p>
 			</div>
