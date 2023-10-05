@@ -245,9 +245,19 @@ scanlineFolder.add(scanlineParams, "Intensity", 0, 1).onChange((value) => {
 });
 
 // Main loop
-let hasConfirmedWarning = false;
+let hasConfirmedWarning;
 function animate(time) {
-	hasConfirmedWarning = hasConfirmedWarning || window.confirm('WARNING. This example may potentially trigger seizures for people with photosensitive epilepsy.');
+	hasConfirmedWarning =
+		hasConfirmedWarning == null
+			? window.confirm(
+					"Warning: This demo may potentially trigger seizures for people with photosensitive epilepsy. Click Cancel to Exit or OK to continue."
+			  )
+			: hasConfirmedWarning;
+
+	if (!hasConfirmedWarning) {
+		return;
+	}
+
 	const timeSeconds = time / 1000;
 	uniforms.inverseViewMatrix = { value: camera.matrixWorld };
 	uniforms.time.value = timeSeconds;
