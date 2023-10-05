@@ -7,7 +7,6 @@ Tone.start();
 const explosionPlayers = ["./assets/audio/explosion-3.wav", "./assets/audio/explosion-4.wav"].map((url) =>
 	new Tone.Player({ url, autostart: false }).toDestination()
 );
-
 explosionPlayers[0].connect(
 	new Tone.Filter({
 		type: "lowpass",
@@ -22,6 +21,9 @@ explosionPlayers[1].connect(
 		rolloff: -48,
 	}).toDestination()
 );
+
+// https://sfxr.me/#6mTcDit2EJ23UxjnAaQtSF2wN267yGjoUTLbm221ePzG7L8T9Zv9W3brhzvPHm8vVwHU1kVUpRoV99FweWf1iVVZAMYzzXM9B9xhovQ9HXmNRaZFAEjBHCGT9
+const warpPlayer = new Tone.Player({ url: "./assets/audio/hyperspace-warp.wav", autostart: false }).toDestination();
 
 const engineSynth = new Tone.NoiseSynth({
 	noise: {
@@ -46,6 +48,10 @@ engineSynth.connect(engineLowpassFilter);
 
 export function playExplosionSound() {
 	explosionPlayers[Math.floor(Math.random() * explosionPlayers.length)].start();
+}
+
+export function playWarpSound() {
+	warpPlayer.start();
 }
 
 export function startEngineSound() {

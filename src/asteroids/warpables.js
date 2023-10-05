@@ -1,4 +1,5 @@
 import { Vector3 } from "three";
+import { playWarpSound } from "./audio";
 
 const warpOutDuration = 0.25;
 const warpInDuration = 0.25;
@@ -58,6 +59,7 @@ export class Warpables {
 			state: "animate-out",
 			animationEllapsed: 0,
 		});
+		playWarpSound();
 	}
 
 	#warpMove(object3d) {
