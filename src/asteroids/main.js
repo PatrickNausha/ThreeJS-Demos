@@ -9,7 +9,6 @@ import {
 	AdditiveBlending,
 	Group,
 	Raycaster,
-	ArrowHelper,
 	PointLight,
 	sRGBEncoding,
 } from "three";
@@ -128,16 +127,6 @@ const loadPromise = (async function load() {
 	explosions.initialize(scene, explosionTexture, 30, 4, 4);
 	createAsteroids(rockGltf, movables, scene);
 	initializeBullets(laserTexture);
-
-	const origin = new Vector3(0, 0, 0);
-	[
-		new ArrowHelper(new Vector3(0, 1, 0).normalize(), origin, 8, 0xff0000),
-		new ArrowHelper(new Vector3(0, -1, 0).normalize(), origin, 7, 0xffff00),
-		new ArrowHelper(new Vector3(-1, -1.3, 0).normalize(), origin, 6.75, 0x00ff00),
-		new ArrowHelper(new Vector3(-1, 0.25, 0).normalize(), origin, 3.25, 0x00ffff),
-		new ArrowHelper(new Vector3(1, 0.25, 0).normalize(), origin, 3.25, 0xffffff),
-		new ArrowHelper(new Vector3(1, -1.3, 0).normalize(), origin, 6.75, 0x5555ff),
-	].forEach((arrowHelper) => scene.add(arrowHelper));
 
 	resetGame();
 })();
