@@ -8,8 +8,10 @@ import {
 	TextureLoader,
 	AdditiveBlending,
 	Group,
-	sRGBEncoding,
+	Raycaster,
+	ArrowHelper,
 	PointLight,
+	sRGBEncoding,
 } from "three";
 import { updateStats, toggleStats } from "../debug-stats";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -126,6 +128,16 @@ const loadPromise = (async function load() {
 	explosions.initialize(scene, explosionTexture, 30, 4, 4);
 	createAsteroids(rockGltf, movables, scene);
 	initializeBullets(laserTexture);
+
+	const origin = new Vector3(0, 0, 0);
+	[
+		new ArrowHelper(new Vector3(0, 1, 0).normalize(), origin, 8, 0xff0000),
+		new ArrowHelper(new Vector3(0, -1, 0).normalize(), origin, 7, 0xffff00),
+		new ArrowHelper(new Vector3(-1, -1.3, 0).normalize(), origin, 6.75, 0x00ff00),
+		new ArrowHelper(new Vector3(-1, 0.25, 0).normalize(), origin, 3.25, 0x00ffff),
+		new ArrowHelper(new Vector3(1, 0.25, 0).normalize(), origin, 3.25, 0xffffff),
+		new ArrowHelper(new Vector3(1, -1.3, 0).normalize(), origin, 6.75, 0x5555ff),
+	].forEach((arrowHelper) => scene.add(arrowHelper));
 
 	resetGame();
 })();
@@ -260,10 +272,40 @@ function step(timestampDifference) {
 		}
 	}
 
-	if (spaceCraft.visible && detectSpaceCraftCollision(spaceCraft.position)) {
-		explosions.explode(spaceCraft.position, 32);
-		spaceCraft.visible = false;
-		gameOverScreen.classList.toggle("d-none");
+	if (spaceCraft.visible) {
+		const raycasters = [
+			new Raycaster(spaceCraft.position, new Vector3(0, 1, 0).normalize().applyEuler(spaceCraft.rotation), 0, 8),
+			new Raycaster(spaceCraft.position, new Vector3(0, -1, 0).normalize().applyEuler(spaceCraft.rotation), 0, 7),
+			new Raycaster(
+				spaceCraft.position,
+				new Vector3(-1, -1.3, 0).normalize().applyEuler(spaceCraft.rotation),
+				0,
+				6.75
+			),
+			new Raycaster(
+				spaceCraft.position,
+				new Vector3(-1, 0.25, 0).normalize().applyEuler(spaceCraft.rotation),
+				0,
+				3.25
+			),
+			new Raycaster(
+				spaceCraft.position,
+				new Vector3(1, 0.25, 0).normalize().applyEuler(spaceCraft.rotation),
+				0,
+				3.25
+			),
+			new Raycaster(
+				spaceCraft.position,
+				new Vector3(1, -1.3, 0).normalize().applyEuler(spaceCraft.rotation),
+				0,
+				6.75
+			),
+		];
+		if (detectSpaceCraftCollision(raycasters)) {
+			explosions.explode(spaceCraft.position, 32);
+			spaceCraft.visible = false;
+			gameOverScreen.classList.toggle("d-none");
+		}
 	}
 }
 

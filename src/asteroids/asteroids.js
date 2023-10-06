@@ -113,14 +113,15 @@ export function explodeAsteroid(asteroid, movables) {
 	return asteroidSizeSmaller;
 }
 
-export function detectSpaceCraftCollision(spaceCraftPosition) {
-	for (const asteroid of asteroids.filter(({ visible }) => visible)) {
-		if (spaceCraftPosition.distanceTo(asteroid.position) < asteroidRadius) {
-			return true;
-		}
-	}
-
-	return false;
+export function detectSpaceCraftCollision(raycasters) {
+	const visibleAsteroids = asteroids.filter(({ visible }) => visible);
+	const rayCollisions = raycasters.flatMap((raycaster) => {
+		const nearAsteroids = visibleAsteroids.filter(
+			({ position }) => raycaster.ray.origin.distanceTo(position) < maxAsteroidSize
+		);
+		return raycaster.intersectObjects(nearAsteroids);
+	});
+	return rayCollisions.length > 0;
 }
 
 const maxAsteroidSize = 20;
