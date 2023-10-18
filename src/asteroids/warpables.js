@@ -63,7 +63,6 @@ export class Warpables {
 	}
 
 	#warpMove(object3d) {
-		console.log(this.#warpableAreaRect);
 		const warpableAreaWidth = this.#warpableAreaRect.right - this.#warpableAreaRect.left;
 		const warpableAreaHeight = this.#warpableAreaRect.top - this.#warpableAreaRect.bottom;
 		const randomX = Math.random() * warpableAreaWidth + this.#warpableAreaRect.left;

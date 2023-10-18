@@ -29,7 +29,7 @@ import {
 	asteroidSizeSmaller,
 	detectSpaceCraftCollision,
 } from "./asteroids";
-import { startEngineSound, stopEngineSound } from "./audio";
+import { initTone, playLaserSound, startEngineSound, stopEngineSound } from "./audio";
 import { Warpables } from "./warpables";
 
 // Gameplay notes
@@ -348,6 +348,7 @@ async function startMainLoop() {
 
 const startScreen = document.getElementById("start-screen");
 document.getElementById("start-button").addEventListener("click", () => {
+	initTone();
 	startMainLoop();
 	startScreen.remove();
 });
@@ -361,9 +362,6 @@ document.getElementById("restart-button").addEventListener("click", () => {
 let nextBulletIndex = 0;
 let isGunCoolingDown = false;
 
-// Avoid pushing up sounds for now and annoying myself with the same noise over and over
-// const audio = null;
-const audio = new Audio("./assets/audio/laser-noise-2.wav");
 function fireBullet(position, rotation) {
 	if (isGunCoolingDown) {
 		return;
@@ -383,11 +381,7 @@ function fireBullet(position, rotation) {
 	movables.setVelocity(bullets[nextBulletIndex], velocity);
 
 	nextBulletIndex = (nextBulletIndex + 1) % bullets.length;
-	if (audio) {
-		audio.pause();
-		audio.currentTime = 0;
-		audio.play();
-	}
+	playLaserSound();
 }
 
 function resizeWindow() {
