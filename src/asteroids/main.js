@@ -149,23 +149,24 @@ const guiParams = {
 	model: "sphere",
 };
 
-const gui = new GUI();
-gui.add(guiParams, "light0").onChange((value) => {
-	whiteLight.visible = value;
-});
-gui.add(guiParams, "light1").onChange((value) => {
-	blueLight.visible = value;
-});
-gui.add(guiParams, "light2").onChange((value) => {
-	orangeLight.visible = value;
-});
-gui.add(guiParams, "laser lights").onChange((value) => {
-	for (const { children } of bullets) {
-		children[1].visible = value;
-	}
-});
-
-toggleStats();
+if (window.location.hostname === "localhost") {
+	const gui = new GUI();
+	gui.add(guiParams, "light0").onChange((value) => {
+		whiteLight.visible = value;
+	});
+	gui.add(guiParams, "light1").onChange((value) => {
+		blueLight.visible = value;
+	});
+	gui.add(guiParams, "light2").onChange((value) => {
+		orangeLight.visible = value;
+	});
+	gui.add(guiParams, "laser lights").onChange((value) => {
+		for (const { children } of bullets) {
+			children[1].visible = value;
+		}
+	});
+	toggleStats();
+}
 
 const bullets = [];
 function initializeBullets(texture) {
